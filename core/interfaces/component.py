@@ -1,13 +1,10 @@
-from abc import ABC
+from typing import Generator
+from abc import abstractmethod
+
 from lantz.qt import Backend
 
-from .conf_ui import ConfigurationUi
-from .run_ui import RunningUi
-from .data_ui import DataDisplayUi
 
+class Component(Backend):
 
-class Component(ABC):
-    backend: Backend
-    conf_ui: ConfigurationUi
-    run_ui: RunningUi
-    data_ui: DataDisplayUi
+    @abstractmethod
+    def get_points(self) -> Generator: pass

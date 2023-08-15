@@ -16,19 +16,19 @@
   <widget class="QWidget" name="central_widget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <widget class="QPushButton" name="pushButton">
-      <property name="enabled">
-       <bool>true</bool>
+     <widget class="QStackedWidget" name="stack_widget">
+      <property name="currentIndex">
+       <number>2</number>
       </property>
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>Start Experiment</string>
-      </property>
+      <widget class="QWidget" name="conf_page">
+       <layout class="QGridLayout" name="gridLayout_2"/>
+      </widget>
+      <widget class="QWidget" name="run_page">
+       <layout class="QGridLayout" name="gridLayout_3"/>
+      </widget>
+      <widget class="QWidget" name="data_page">
+       <layout class="QGridLayout" name="gridLayout_4"/>
+      </widget>
      </widget>
     </item>
    </layout>

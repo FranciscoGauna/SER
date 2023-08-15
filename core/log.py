@@ -11,3 +11,9 @@ lantz_log.LOGGER = lantz_log.get_logger("SER")
 LOGGER = lantz_log.LOGGER
 log_to_screen = lantz_log.log_to_screen
 log_to_socket = lantz_log.log_to_socket
+
+# Naming scheme
+# All always start with SER, important to make the handlers work
+# Then the next element is the component name, for the core we use Core
+# Then we use the name of the class
+# Everything there should use PascalCase
