@@ -3,12 +3,6 @@ charset-normalizer==3.2.0
 click==8.1.6
 colorama==0.4.6
 idna==3.4
-lantz-core==0.5.3
-lantz-drivers==0.5.2
-lantz-ino==0.5.2
-lantz-qt==0.5.3
-lantz-sims==0.5.2
-lantzdev==0.5.2
 pimpmyclass==0.4.3
 Pint==0.22
 PyQt5==5.15.9

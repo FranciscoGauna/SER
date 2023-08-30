@@ -25,7 +25,14 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <widget class="QSpinBox" name="x_amount_spinbox"/>
+    <widget class="QSpinBox" name="x_amount_spinbox">
+     <property name="minimum">
+      <number>2</number>
+     </property>
+     <property name="maximum">
+      <number>10000</number>
+     </property>
+    </widget>
    </item>
    <item row="0" column="1">
     <widget class="QLabel" name="x_init_label">
@@ -45,7 +52,14 @@
     </widget>
    </item>
    <item row="3" column="0">
-    <widget class="QSpinBox" name="y_amount_spinbox"/>
+    <widget class="QSpinBox" name="y_amount_spinbox">
+     <property name="minimum">
+      <number>2</number>
+     </property>
+     <property name="maximum">
+      <number>10000</number>
+     </property>
+    </widget>
    </item>
    <item row="0" column="2">
     <widget class="QLabel" name="x_final_label">
@@ -76,6 +90,14 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>x_amount_spinbox</tabstop>
+  <tabstop>x_init_spinbox</tabstop>
+  <tabstop>x_final_spinbox</tabstop>
+  <tabstop>y_amount_spinbox</tabstop>
+  <tabstop>y_init_spinbox</tabstop>
+  <tabstop>y_final_spinbox</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

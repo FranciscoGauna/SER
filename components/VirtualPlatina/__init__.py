@@ -1,10 +1,11 @@
 from core.interfaces import Component
-from .platina_frontend import PointSelectFrontend
+from .platina_frontend import PointSelectFrontend, PointSelectBackend
 
 
 def create_component() -> Component:
     comp = Component()
-    comp.conf_ui = PointSelectFrontend()
+    comp.instrument = PointSelectBackend()
+    comp.conf_ui = PointSelectFrontend(backend=comp.instrument)
     comp.run_ui = None
     comp.data_ui = None
     return comp

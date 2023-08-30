@@ -6,10 +6,10 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QPushButton, QStackedWidget
 from pimpmyclass.mixins import LogMixin
 
-from .interfaces import ComponentInitialization
+from ..interfaces import ComponentInitialization
+from ..model.run_experiment import ExperimentRunner
 
 
-### Summary
 class MainWindow(QMainWindow, LogMixin):
     conf_layout: QGridLayout
     run_layout: QGridLayout
@@ -18,7 +18,7 @@ class MainWindow(QMainWindow, LogMixin):
     stack_widget: QStackedWidget
     start_button: QPushButton
 
-    def __init__(self, components: Collection[ComponentInitialization]):
+    def __init__(self, components: Collection[ComponentInitialization], runner: ExperimentRunner):
         super().__init__()
         ui_file_path = path.join(path.dirname(path.realpath(__file__)), "main_window.ui")
         uic.loadUi(ui_file_path, self)
@@ -28,6 +28,7 @@ class MainWindow(QMainWindow, LogMixin):
         self.data_layout = self.data_page.layout()
 
         self.components = components
+        self.runner = runner
         self.logger = get_logger("SER.Core.MainWindow")
         self.load_config_gui()
         self.show()
@@ -48,9 +49,9 @@ class MainWindow(QMainWindow, LogMixin):
 
     def start_experiment(self):
         """
-        This method runs strictly after the configuration so it spefically cleans the gui of those widgets
+        This method runs strictly after the configuration, so it cleans the gui of those widgets
         :return: None
         """
         self.log_debug(msg="Changing interface to the experiment interface")
         self.stack_widget.setCurrentWidget(self.run_page)
-        self.log_debug(msg="Loading up data points for experiment")
+        self.runner.run_experiment()

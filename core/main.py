@@ -3,9 +3,10 @@ from typing import Collection
 
 from PyQt5.QtWidgets import QApplication
 
-from core.main_window import MainWindow
-from core.interfaces import ComponentInitialization
-from core.log import log_to_socket, LOGGER
+from .model.run_experiment import ExperimentRunner
+from .ui.main_window import MainWindow
+from .interfaces import ComponentInitialization
+from .log import log_to_socket, LOGGER
 
 
 def launch_app(
@@ -19,9 +20,10 @@ def launch_app(
     app = QApplication([])  # We don't use any Qt commandline args
 
     # The list here is an ugly hack to get the map to execute
-    list(map(ComponentInitialization.init, configurable_components))
-    list(map(ComponentInitialization.init, observable_components))
+    list(map(ComponentInitialization.initialize, configurable_components))
+    list(map(ComponentInitialization.initialize, observable_components))
 
     # The main interface that has the code to start the experiment
-    window = MainWindow(configurable_components, observable_components)
+    runner = ExperimentRunner(configurable_components, observable_components)
+    window = MainWindow([*configurable_components, *observable_components], runner)
     app.exec()

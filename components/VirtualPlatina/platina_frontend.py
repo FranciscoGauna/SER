@@ -4,6 +4,8 @@ from PyQt5.QtWidgets import QSpinBox, QApplication
 from lantz.core import Feat
 from lantz.qt import Frontend, Backend
 
+from core.interfaces import ConfigurationUI
+
 
 class PointSelectBackend(Backend):
     """
@@ -12,10 +14,10 @@ class PointSelectBackend(Backend):
 
     def __init__(self, **instruments_and_backends):
         super().__init__(**instruments_and_backends)
-        self._x_amount = 0
+        self._x_amount = 2
         self._x_init = 0
         self._x_final = 0
-        self._y_amount = 0
+        self._y_amount = 2
         self._y_init = 0
         self._y_final = 0
 
@@ -68,13 +70,23 @@ class PointSelectBackend(Backend):
         self._y_final = val
 
 
-class PointSelectFrontend(Frontend):
+class PointSelectFrontend(ConfigurationUI):
     gui = "point_select.ui"
 
-    def get_runtime_params(self) -> Union[Generator, List]:
+    def __init__(self, parent=None, backend=None):
+        super().__init__(parent, backend)
+        self.connect_feat(self.widget.x_amount_spinbox, self.backend, "x_amount")
+        self.connect_feat(self.widget.x_init_spinbox, self.backend, "x_init")
+        self.connect_feat(self.widget.x_final_spinbox, self.backend, "x_final")
+        self.connect_feat(self.widget.y_amount_spinbox, self.backend, "y_amount")
+        self.connect_feat(self.widget.y_init_spinbox, self.backend, "y_init")
+        self.connect_feat(self.widget.y_final_spinbox, self.backend, "y_final")
+
+    def get_points(self) -> Union[Generator, List]:
         x_delta = (self.backend.x_final - self.backend.x_init) / (self.backend.x_amount - 1)
         y_delta = (self.backend.y_final - self.backend.y_init) / (self.backend.y_amount - 1)
 
         for x in range(self.backend.x_amount):
-            for y in range(self.backend.y_amount):
-                yield self.backend.x_init + x * x_delta, self.backend.y_init + y * y_delta
+            yield x
+            #for y in range(self.backend.y_amount):
+            #    yield self.backend.x_init + x * x_delta, self.backend.y_init + y * y_delta

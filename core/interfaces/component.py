@@ -1,10 +1,25 @@
-from typing import Generator
-from abc import abstractmethod
+from typing import Callable
 
-from lantz.qt import Backend
+from . import Instrument
+from . import ConfigurationUI, ProcessUI
 
 
-class Component(Backend):
+class Component:
+    name: str  # The name of the component, used to distinguish the different components for the data UI
+    instrument: Instrument
+    conf_ui: ConfigurationUI
+    run_ui: ProcessUI
 
-    @abstractmethod
-    def get_points(self) -> Generator: pass
+
+class ComponentInitialization:
+    component = Component
+
+    def __init__(self, constructor: Callable[[], Component], alignment: int, x: int, y: int):
+        self.constructor = constructor
+        self.alignment = alignment
+        self.x = x
+        self.y = y
+
+    def initialize(self):
+        self.component = self.constructor()
+        return self.component
