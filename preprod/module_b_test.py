@@ -3,7 +3,7 @@ from logging import DEBUG
 
 
 def fun():
-    LOGGER.log(msg="test", level=DEBUG)
+    LOGGER.log(msg="tests", level=DEBUG)
 
 
 if __name__ == "__main__":

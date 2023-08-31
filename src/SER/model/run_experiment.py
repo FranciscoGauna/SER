@@ -4,7 +4,6 @@ from lantz.core.log import get_logger
 from pimpmyclass.mixins import LogMixin
 
 from ..interfaces import ComponentInitialization
-from ..utils.gen import comp_generator
 
 
 class ExperimentRunner(LogMixin):
@@ -19,7 +18,7 @@ class ExperimentRunner(LogMixin):
         self.conf_comp = configurable_components
 
     def get_config_point(self) -> Generator:
-        return comp_generator(self.conf_comp)
+        return []
 
     def run_experiment(self):
         self.log_info("Starting Experiment")

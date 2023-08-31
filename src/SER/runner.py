@@ -1,7 +1,3 @@
-from typing import Collection
-
-from .interfaces import Component
-
 class Runner:
     """
     Model class at the center of the S.E.R.

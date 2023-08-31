@@ -1,4 +1,4 @@
-from core.interfaces import Component
+from src.SER.interfaces import Component
 from .platina_frontend import PointSelectFrontend, PointSelectBackend
 
 

@@ -11,10 +11,10 @@ log_to_socket(logging.DEBUG, "127.0.0.1", 19996)
 class TestDriver(Frontend):
     def __init__(self):
         super().__init__()
-        self.logger_name = "lantz.test"
+        self.logger_name = "lantz.tests"
 
     def log_shit(self):
-        self.log_error("test")
+        self.log_error("tests")
 
 
 app = QApplication([])

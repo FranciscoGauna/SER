@@ -3,7 +3,7 @@ from typing import Collection
 from logging import getLogger as get_logger
 
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QPushButton, QStackedWidget
+from PyQt5.QtWidgets import QMainWindow, QGridLayout, QPushButton, QStackedWidget
 from pimpmyclass.mixins import LogMixin
 
 from ..interfaces import ComponentInitialization

@@ -1,10 +1,9 @@
 from typing import Union, Generator, List
 
-from PyQt5.QtWidgets import QSpinBox, QApplication
 from lantz.core import Feat
-from lantz.qt import Frontend, Backend
+from lantz.qt import Backend
 
-from core.interfaces import ConfigurationUI
+from src.SER.interfaces import ConfigurationUI
 
 
 class PointSelectBackend(Backend):
@@ -87,6 +86,6 @@ class PointSelectFrontend(ConfigurationUI):
         y_delta = (self.backend.y_final - self.backend.y_init) / (self.backend.y_amount - 1)
 
         for x in range(self.backend.x_amount):
-            yield x
+            yield self.backend.x_init + x * x_delta
             #for y in range(self.backend.y_amount):
             #    yield self.backend.x_init + x * x_delta, self.backend.y_init + y * y_delta
