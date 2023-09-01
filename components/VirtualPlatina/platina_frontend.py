@@ -86,6 +86,5 @@ class PointSelectFrontend(ConfigurationUI):
         y_delta = (self.backend.y_final - self.backend.y_init) / (self.backend.y_amount - 1)
 
         for x in range(self.backend.x_amount):
-            yield self.backend.x_init + x * x_delta
-            #for y in range(self.backend.y_amount):
-            #    yield self.backend.x_init + x * x_delta, self.backend.y_init + y * y_delta
+            for y in range(self.backend.y_amount):
+                yield self.backend.x_init + x * x_delta, self.backend.y_init + y * y_delta

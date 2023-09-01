@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QMainWindow, QGridLayout, QPushButton, QStackedWidge
 from pimpmyclass.mixins import LogMixin
 
 from ..interfaces import ComponentInitialization
-from ..model.run_experiment import ExperimentRunner
+from ..model.runner import ExperimentRunner
 
 
 class MainWindow(QMainWindow, LogMixin):

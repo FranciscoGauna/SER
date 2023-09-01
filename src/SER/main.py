@@ -3,7 +3,7 @@ from typing import Collection
 
 from PyQt5.QtWidgets import QApplication
 
-from .model.run_experiment import ExperimentRunner
+from .model.runner import ExperimentRunner
 from .ui.main_window import MainWindow
 from .interfaces import ComponentInitialization
 from .log import log_to_socket, LOGGER

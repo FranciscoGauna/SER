@@ -17,8 +17,17 @@ class ConfigurationUI(Frontend):
         super().__init__(parent, backend)
 
     @abstractmethod
-    def get_points(self) -> Union[Generator, Collection]:
-        raise NotImplementedError("The function get_points was not implemented")
+    def get_points(self) -> Generator:
+        """
+        The function get_points is tasked with providing the points a component will use during its execution.
+        The way it does this is through python Generators, as the task reads the task point by point. You can also
+        provide other iterators that support next(_) and StopIteration.
+
+        If 2 components are coupled AKA they both move simultaneously, they need to yield the same amount of points.
+        Not respecting this is undefined behaviour
+        :return: Generator with the amount of desired points
+        """
+        yield
 
 
 class ProcessUI(Frontend):

@@ -2,14 +2,25 @@ from typing import Any, Tuple, Callable, List, Generator, Self, Dict
 
 
 class MultipleArgTracker:
+    generators: List[
+        Tuple[
+            Generator,  # The generators we want to call, we store the reset function on the gen_fun variable
+            Callable  # The function that takes the args in generator
+        ]
+    ]
+
     def __init__(self, generators: List[Callable[[], Generator]], functions: List[Callable], next_tracker: Callable, parent):
-        self.fun_gens = generators
+        self.functions = functions
+        self.gen_fun = generators
         assert len(generators) == len(functions)
-        self.generators = []
-        for i in range(len(generators)):
-            self.generators.append((generators[i](), functions[i]))
+        self.reset_generators()
         self.next = next_tracker
         self.parent = parent
+
+    def reset_generators(self):
+        self.generators = []
+        for i in range(len(self.functions)):
+            self.generators.append((self.gen_fun[i](), self.functions[i]))
 
     def advance(self):
         try:
@@ -18,34 +29,38 @@ class MultipleArgTracker:
                 f(arg)
         except StopIteration:
             self.next()
+            # The 'last' MultipleArgTracker is connected to the parent calling it to stop
             if self.parent.stopped:
                 return
-            old_gens = self.generators
-            self.generators = []
-            for i in range(len(old_gens)):
-                self.generators.append((self.fun_gens[i](), old_gens[i][1]))
+            self.reset_generators()
             for g, f in self.generators:
                 arg = next(g)
                 f(arg)
 
 
 class MetaArgTracker:
+    """
+    The MetaArgTracker is the class that is tasked with administering the generators for the components, and passing
+    those arguments to a function. The function could be arbitrary but the actual responsibility of task parallelization
+    will be from the Dispatcher
+    """
 
     def __init__(self, generators: List[Tuple[int, Callable[[], Generator], Callable]]):
         self.trackers: List[MultipleArgTracker] = []
         self.stopped = False
 
-        alignments: Dict[int, List[Tuple[Callable[[], Generator], Callable]]]
-        alignments = {}
+        # First, we store the
+        couplings: Dict[int, List[Tuple[Callable[[], Generator], Callable]]]
+        couplings = {}
         for comp in generators:
-            if comp[0] in alignments:
-                alignments[comp[0]].append((comp[1], comp[2]))
+            if comp[0] in couplings:
+                couplings[comp[0]].append((comp[1], comp[2]))
             else:
-                alignments[comp[0]] = [(comp[1], comp[2])]
+                couplings[comp[0]] = [(comp[1], comp[2])]
 
         sorted_gens: List[List[Tuple[Callable[[], Generator], Callable]]] = []
-        for k in sorted(alignments.keys()):
-            sorted_gens.append(alignments[k])
+        for k in sorted(couplings.keys()):
+            sorted_gens.append(couplings[k])
 
         self.trackers.append(MultipleArgTracker(
             [x[0] for x in sorted_gens[0]],
