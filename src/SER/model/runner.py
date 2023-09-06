@@ -1,10 +1,11 @@
 from datetime import datetime
-from typing import Collection, Generator
+from typing import Collection, Generator, Callable
 
 from lantz.core.log import get_logger
 from pimpmyclass.mixins import LogMixin
 
 from ..interfaces import ComponentInitialization
+from ..utils.dispatcher import Dispatcher
 from ..utils.gen import MetaArgTracker
 
 
@@ -21,20 +22,20 @@ class ExperimentRunner(LogMixin):
         self.observe_comp = observable_components
         self.conf_comp = configurable_components
 
+        # We create an instance of the dispatcher:
+        self.dispatcher = Dispatcher()
+
         # We create the meta arg tracker
         # To do so we need a structure of each generator with the corresponding functions
         generators = [
             (
                 comp.coupling,
                 comp.component.conf_ui.get_points,
-                self.lambda_creator(comp.name)
+                self.dispatcher.wrap(comp.component.instrument.configure)
             )
             for comp in configurable_components
         ]
         self.arg_tracker = MetaArgTracker(generators)
-
-    def lambda_creator(self, name):
-        return lambda args: self.log_print(name, args)
 
     # TODO: Remove this
     def log_print(self, identifier, args):
@@ -43,8 +44,11 @@ class ExperimentRunner(LogMixin):
     def run_experiment(self):
         self.log_info("Starting Experiment")
         self.arg_tracker.start()
+        print(self.dispatcher.execute())
 
+        # TODO:
         self.log_debug("Advanced one iteration")
         while self.arg_tracker.advance():
+            print(self.dispatcher.execute())
             self.log_debug("Advanced one iteration")
 

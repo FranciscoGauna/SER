@@ -1,15 +1,23 @@
 from typing import Union, Generator, List
+from time import sleep
 
 from lantz.core import Feat
 from lantz.qt import Backend
 
 from src.SER.interfaces import ConfigurationUI
+from src.SER.interfaces.instrument import ConfigurableInstrument
 
 
-class PointSelectBackend(Backend):
+class PointSelectBackend(ConfigurableInstrument):
     """
     This class exists only to utilize the connect_feat function from Lantz.
     """
+
+    def configure(self, x, y):
+        self.log_error(f"Configured the args x:{x} y:{y}")
+        sleep(1)
+        self.log_debug("Finished configuration")
+        return x+y
 
     def __init__(self, **instruments_and_backends):
         super().__init__(**instruments_and_backends)

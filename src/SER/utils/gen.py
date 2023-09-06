@@ -26,7 +26,7 @@ class MultipleArgTracker:
         try:
             for g, f in self.generators:
                 arg = next(g)
-                f(arg)
+                f(*arg)
         except StopIteration:
             self.next()
             # The 'last' MultipleArgTracker is connected to the parent calling it to stop
@@ -35,14 +35,14 @@ class MultipleArgTracker:
             self.reset_generators()
             for g, f in self.generators:
                 arg = next(g)
-                f(arg)
+                f(*arg)
 
 
 class MetaArgTracker:
     """
     The MetaArgTracker is the class that is tasked with administering the generators for the components, and passing
-    those arguments to a function. The function could be arbitrary but the actual responsibility of task parallelization
-    will be from the Dispatcher
+    those arguments to a function. The function could be arbitrary but the actual responsibility of execution and
+    task parallelization will be from the Dispatcher class.
     """
 
     def __init__(self, generators: List[Tuple[int, Callable[[], Generator], Callable]]):

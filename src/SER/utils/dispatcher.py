@@ -1,12 +1,26 @@
+from typing import Callable, List, Tuple, Any
+from concurrent.futures import ThreadPoolExecutor
+
+from lantz.core.log import get_logger
+from pimpmyclass.mixins import LogMixin
 
 
-class Dispatcher:
+class Dispatcher(LogMixin):
+    tasks: List[Tuple[Callable, Any]]
 
     def __init__(self):
-        pass
+        self.logger = get_logger("SER.Core.ExperimentRunner")
+        self.tasks = []
 
-    def add_task(self):
-        pass
+    def wrap(self, fun: Callable) -> Callable:
+        return lambda *args: self.add_task(fun, args)
+
+    def add_task(self, fun: Callable, args):
+        self.tasks.append((fun, args))
 
     def execute(self):
-        pass
+        with ThreadPoolExecutor() as executor:
+            futures = [executor.submit(task[0], *task[1]) for task in self.tasks]
+        self.tasks.clear()
+
+        return [f.result() for f in futures]
