@@ -1,4 +1,4 @@
-from typing import Callable, List, Tuple, Any
+from typing import Callable, List, Tuple, Any, Collection, Dict
 from concurrent.futures import ThreadPoolExecutor
 
 from lantz.core.log import get_logger
@@ -9,7 +9,7 @@ class Dispatcher(LogMixin):
     tasks: List[Tuple[Callable, Any]]
 
     def __init__(self):
-        self.logger = get_logger("SER.Core.ExperimentRunner")
+        self.logger = get_logger("SER.Core.Dispatcher")
         self.tasks = []
 
     def wrap(self, fun: Callable) -> Callable:
@@ -18,7 +18,7 @@ class Dispatcher(LogMixin):
     def add_task(self, fun: Callable, args):
         self.tasks.append((fun, args))
 
-    def execute(self):
+    def execute(self) -> Collection[Tuple[str, Dict[str, Any]]]:
         with ThreadPoolExecutor() as executor:
             futures = [executor.submit(task[0], *task[1]) for task in self.tasks]
         self.tasks.clear()

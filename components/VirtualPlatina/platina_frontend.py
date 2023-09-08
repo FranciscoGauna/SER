@@ -4,8 +4,7 @@ from time import sleep
 from lantz.core import Feat
 from lantz.qt import Backend
 
-from src.SER.interfaces import ConfigurationUI
-from src.SER.interfaces.instrument import ConfigurableInstrument
+from src.SER.interfaces import ConfigurationUI, ConfigurableInstrument
 
 
 class PointSelectBackend(ConfigurableInstrument):
@@ -14,10 +13,9 @@ class PointSelectBackend(ConfigurableInstrument):
     """
 
     def configure(self, x, y):
-        self.log_error(f"Configured the args x:{x} y:{y}")
-        sleep(1)
+        sleep(0.1)
         self.log_debug("Finished configuration")
-        return x+y
+        return {"x": x, "y": y}
 
     def __init__(self, **instruments_and_backends):
         super().__init__(**instruments_and_backends)

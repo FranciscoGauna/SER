@@ -42,7 +42,7 @@ class ProcessUI(Frontend):
         super().__init__(parent, backend)
 
     @abstractmethod
-    def set_result(self, *args) -> Union[Generator, Collection]:
+    def set_result(self, *args):
         raise NotImplementedError("The function set_result was not implemented")
 
 
@@ -57,7 +57,7 @@ class ProcessDataUI(Frontend):
         super().__init__(parent, backend)
 
     @abstractmethod
-    def set_datum(self, components: Dict[str, Collection]) -> Union[Generator, Collection]:
+    def set_datum(self, components: Dict[str, Collection]):
         raise NotImplementedError("The function set_result was not implemented")
 
 
@@ -71,5 +71,5 @@ class FinalDataUI(Frontend):
         super().__init__(parent, backend)
 
     @abstractmethod
-    def set_data(self, components: Dict[str, Collection]) -> Union[Generator, Collection]:
+    def set_data(self, components: Dict[str, Collection]):
         raise NotImplementedError("The function set_result was not implemented")

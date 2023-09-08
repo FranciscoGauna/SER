@@ -48,6 +48,7 @@ class MetaArgTracker:
     def __init__(self, generators: List[Tuple[int, Callable[[], Generator], Callable]]):
         self.trackers: List[MultipleArgTracker] = []
         self.stopped = False
+        self.started = False
 
         # First, we store the
         couplings: Dict[int, List[Tuple[Callable[[], Generator], Callable]]]
@@ -78,10 +79,20 @@ class MetaArgTracker:
             ))
 
     def start(self):
+        self.started = True
         for tracker in self.trackers:
             tracker.advance()
 
     def advance(self) -> bool:
+        """
+        This advances the most "quick" generator (meaning the one that is updated on every iteration) and if it runs
+        out of numbers, it advances the next generator. After advancing, it executes the function given.
+
+        :return: bool indicating if the tracker has elements to continue
+        """
+        if not self.started:
+            self.start()
+            return not self.stopped
         if not self.stopped:
             self.trackers[-1].advance()
             return not self.stopped

@@ -1,4 +1,5 @@
 from os import path
+from threading import Thread
 from typing import Collection
 from logging import getLogger as get_logger
 
@@ -29,6 +30,8 @@ class MainWindow(QMainWindow, LogMixin):
 
         self.components = components
         self.runner = runner
+        self.run_thread = Thread(target=self.run_experiment)
+        self.started = False
         self.logger = get_logger("SER.Core.MainWindow")
         self.load_config_gui()
         self.show()
@@ -52,6 +55,13 @@ class MainWindow(QMainWindow, LogMixin):
         This method runs strictly after the configuration, so it cleans the gui of those widgets
         :return: None
         """
-        self.log_debug(msg="Changing interface to the experiment interface")
-        self.stack_widget.setCurrentWidget(self.run_page)
+        if not self.started:
+            self.started = True
+            self.log_debug(msg="Changing interface to the experiment interface")
+            self.stack_widget.setCurrentWidget(self.run_page)
+        self.run_thread.start()
+
+    def run_experiment(self):
         self.runner.run_experiment()
+        self.log_debug(msg="Changing interface to the data interface")
+        self.stack_widget.setCurrentWidget(self.data_page)

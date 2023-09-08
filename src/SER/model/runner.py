@@ -1,14 +1,12 @@
-from datetime import datetime
-from typing import Collection, Generator, Callable
+from typing import Collection
 
 from lantz.core.log import get_logger
 from pimpmyclass.mixins import LogMixin
 
+from .data_repository import DataRepository
 from ..interfaces import ComponentInitialization
-from ..utils.dispatcher import Dispatcher
-from ..utils.gen import MetaArgTracker
-
-
+from .dispatcher import Dispatcher
+from .gen import MetaArgTracker
 
 
 class ExperimentRunner(LogMixin):
@@ -21,6 +19,7 @@ class ExperimentRunner(LogMixin):
         self.logger = get_logger("SER.Core.ExperimentRunner")
         self.observe_comp = observable_components
         self.conf_comp = configurable_components
+        self.data = DataRepository()
 
         # We create an instance of the dispatcher:
         self.dispatcher = Dispatcher()
@@ -31,24 +30,30 @@ class ExperimentRunner(LogMixin):
             (
                 comp.coupling,
                 comp.component.conf_ui.get_points,
-                self.dispatcher.wrap(comp.component.instrument.configure)
+                self.wrap_fun(comp.name, comp.component.instrument.configure)
             )
             for comp in configurable_components
         ]
+
         self.arg_tracker = MetaArgTracker(generators)
 
-    # TODO: Remove this
-    def log_print(self, identifier, args):
-        self.log_debug(f"{identifier}: {args}, type:{type(args)}")
+    def wrap_fun(self, name, fun):
+        wrapped_fun = lambda *args: self.data.add_datum(name, fun(*args))
+        return self.dispatcher.wrap(wrapped_fun)
 
     def run_experiment(self):
         self.log_info("Starting Experiment")
-        self.arg_tracker.start()
-        print(self.dispatcher.execute())
 
-        # TODO:
-        self.log_debug("Advanced one iteration")
         while self.arg_tracker.advance():
-            print(self.dispatcher.execute())
+            self.data.next()
+            self.dispatcher.execute()
+
+            for comp in self.observe_comp:
+                self.wrap_fun(comp.name, comp.component.instrument.observe)()
+                self.dispatcher.execute()
+
             self.log_debug("Advanced one iteration")
 
+        # TODO: Remove this forced print to file
+        self.data.to_file()
+        self.log_info("Ending Experiment")

@@ -18,16 +18,32 @@
     <item row="0" column="0">
      <widget class="QStackedWidget" name="stack_widget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="conf_page">
        <layout class="QGridLayout" name="gridLayout_2"/>
       </widget>
       <widget class="QWidget" name="run_page">
-       <layout class="QGridLayout" name="gridLayout_3"/>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>RUNNING</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="data_page">
-       <layout class="QGridLayout" name="gridLayout_4"/>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>FINISHED</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>

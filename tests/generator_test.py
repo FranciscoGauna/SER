@@ -2,7 +2,7 @@ from typing import List, Any, Generator
 from time import sleep
 from datetime import datetime
 
-from src.SER.utils.gen import MetaArgTracker
+from src.SER.model.gen import MetaArgTracker
 
 
 def log_print(*args):
