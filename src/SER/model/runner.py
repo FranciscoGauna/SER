@@ -1,4 +1,4 @@
-from typing import Collection
+from typing import Collection, Callable
 
 from lantz.core.log import get_logger
 from pimpmyclass.mixins import LogMixin
@@ -41,7 +41,7 @@ class ExperimentRunner(LogMixin):
         wrapped_fun = lambda *args: self.data.add_datum(name, fun(*args))
         return self.dispatcher.wrap(wrapped_fun)
 
-    def run_experiment(self):
+    def run_experiment(self, iteration_callback: Callable = None):
         self.log_info("Starting Experiment")
 
         while self.arg_tracker.advance():
@@ -52,8 +52,10 @@ class ExperimentRunner(LogMixin):
                 self.wrap_fun(comp.name, comp.component.instrument.observe)()
                 self.dispatcher.execute()
 
+            if iteration_callback:
+                iteration_callback()
             self.log_debug("Advanced one iteration")
 
         # TODO: Remove this forced print to file
-        self.data.to_file()
+        self.data.to_csv("output.csv")
         self.log_info("Ending Experiment")
