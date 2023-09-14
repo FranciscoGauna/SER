@@ -4,7 +4,7 @@ from typing import Collection
 from logging import getLogger as get_logger
 
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow, QGridLayout, QPushButton, QStackedWidget, QWidget
+from PyQt5.QtWidgets import QMainWindow, QGridLayout, QPushButton, QStackedWidget, QWidget, QStackedWidget
 from pimpmyclass.mixins import LogMixin
 
 from ..interfaces import ComponentInitialization
@@ -21,7 +21,9 @@ class MainWindow(QMainWindow, LogMixin):
 
     progress_tracker: QWidget
 
-    conf_page: QSt
+    conf_page: QStackedWidget
+    run_page: QStackedWidget
+    data_page: QStackedWidget
 
     def __init__(self, components: Collection[ComponentInitialization], runner: ExperimentRunner):
         super().__init__()
@@ -38,6 +40,8 @@ class MainWindow(QMainWindow, LogMixin):
         self.started = False
         self.logger = get_logger("SER.Core.MainWindow")
         self.load_config_gui()
+        self.load_run_gui()
+        self.load_data_gui()
         self.show()
 
     def load_config_gui(self):
@@ -56,7 +60,9 @@ class MainWindow(QMainWindow, LogMixin):
 
     def load_run_gui(self):
         self.log_debug(msg="Started loading run interface")
-        self.
+
+    def load_data_gui(self):
+        self.log_debug(msg="Started loading data interface")
 
     def start_experiment(self):
         """
@@ -67,7 +73,7 @@ class MainWindow(QMainWindow, LogMixin):
             self.started = True
             self.log_debug(msg="Changing interface to the experiment interface")
             self.stack_widget.setCurrentWidget(self.run_page)
-        self.run_thread.start()
+            self.run_thread.start()
 
     def run_experiment(self):
         self.runner.run_experiment()
