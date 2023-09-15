@@ -7,6 +7,7 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow, QGridLayout, QPushButton, QStackedWidget, QWidget, QStackedWidget
 from pimpmyclass.mixins import LogMixin
 
+from .progress_tracker import ProgressTracker
 from ..interfaces import ComponentInitialization
 from ..model.runner import ExperimentRunner
 
@@ -19,7 +20,7 @@ class MainWindow(QMainWindow, LogMixin):
     stack_widget: QStackedWidget
     start_button: QPushButton
 
-    progress_tracker: QWidget
+    progress_tracker: ProgressTracker
 
     conf_page: QStackedWidget
     run_page: QStackedWidget
@@ -60,6 +61,8 @@ class MainWindow(QMainWindow, LogMixin):
 
     def load_run_gui(self):
         self.log_debug(msg="Started loading run interface")
+        self.progress_tracker = ProgressTracker()
+        self.run_layout.addWidget(self.progress_tracker)
 
     def load_data_gui(self):
         self.log_debug(msg="Started loading data interface")

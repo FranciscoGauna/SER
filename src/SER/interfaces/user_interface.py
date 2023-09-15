@@ -29,6 +29,10 @@ class ConfigurationUI(Frontend):
         """
         yield
 
+    @abstractmethod
+    def point_amount(self) -> int:
+        return 0
+
 
 class ProcessUI(Frontend):
     """This class represents the User Interface that is displayed to the during the execution of the experiment. It

@@ -13,7 +13,7 @@ class PointSelectBackend(ConfigurableInstrument):
     """
 
     def configure(self, x, y):
-        sleep(0.1)
+        sleep(1)
         self.log_debug("Finished configuration")
         return {"x": x, "y": y}
 
