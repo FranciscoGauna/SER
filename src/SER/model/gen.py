@@ -37,6 +37,9 @@ class MultipleArgTracker:
                 arg = next(g)
                 f(*arg)
 
+    def amount(self) -> int:
+        return len(list(self.gen_fun[0]()))
+
 
 class MetaArgTracker:
     """
@@ -100,3 +103,9 @@ class MetaArgTracker:
 
     def stop(self):
         self.stopped = True
+
+    def points_amount(self) -> int:
+        mult = 1
+        for tracker in self.trackers:
+            mult *= tracker.amount()
+        return mult

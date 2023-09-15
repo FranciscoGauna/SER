@@ -76,6 +76,7 @@ class PointSelectBackend(ConfigurableInstrument):
 
 
 class PointSelectFrontend(ConfigurationUI):
+
     gui = "point_select.ui"
 
     def __init__(self, parent=None, backend=None):
@@ -94,3 +95,6 @@ class PointSelectFrontend(ConfigurationUI):
         for x in range(self.backend.x_amount):
             for y in range(self.backend.y_amount):
                 yield self.backend.x_init + x * x_delta, self.backend.y_init + y * y_delta
+
+    def point_amount(self) -> int:
+        return self.backend.x_amount * self.backend.y_amount

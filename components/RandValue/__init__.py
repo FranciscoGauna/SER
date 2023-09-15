@@ -7,5 +7,4 @@ def create_component() -> Component:
     comp.instrument = RandValInstrument()
     comp.conf_ui = RandValConfUi(backend=comp.instrument)
     comp.run_ui = None
-    comp.data_ui = None
     return comp
