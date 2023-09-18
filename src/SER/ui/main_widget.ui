@@ -14,7 +14,7 @@
    <string>StackedWidget</string>
   </property>
   <property name="currentIndex">
-   <number>1</number>
+   <number>2</number>
   </property>
   <widget class="QWidget" name="conf_page">
    <layout class="QGridLayout" name="gridLayout">
@@ -99,6 +99,9 @@
       </property>
       <layout class="QGridLayout" name="gridLayout_6"/>
      </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QTableView" name="data_table"/>
     </item>
    </layout>
   </widget>
