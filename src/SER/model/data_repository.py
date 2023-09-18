@@ -4,6 +4,7 @@ from lantz.core.log import get_logger
 from pimpmyclass.mixins import LogMixin
 import pandas as pd
 
+
 class DataRepository(LogMixin):
 
     def __init__(self):
@@ -13,7 +14,7 @@ class DataRepository(LogMixin):
     def next(self):
         self.data.append({})
 
-    def add_datum(self, name: str, datum: Any):
+    def add_datum(self, name: str, datum: Dict[str, Any]):
         self.data[-1][name] = datum
 
     def to_dataframe(self) -> pd.DataFrame:
@@ -34,7 +35,9 @@ class DataRepository(LogMixin):
                 else:
                     line_val[f"{k}_{v}"] = float("NaN")
             vals.append(line_val)
-        return pd.DataFrame(vals)
+
+        df = pd.DataFrame(vals)
+        return df[sorted(df.columns)]
 
     def to_csv(self, filename: str):
         # TODO: rethink if this is the proper file structure

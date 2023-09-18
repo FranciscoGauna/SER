@@ -5,25 +5,26 @@ from typing import Collection
 from logging import getLogger as get_logger
 
 from PyQt5.QtWidgets import QGroupBox, QLabel, QProgressBar
+from PyQt5.QtCore import pyqtSignal
 from pimpmyclass.mixins import LogMixin
 
 
 class ProgressTracker(LogMixin):
 
-    def __init__(self, progress_bar: QProgressBar, progress_label: QLabel, amount: int):
+    def __init__(self, progress_bar: QProgressBar, progress_label: QLabel):
         super().__init__()
         self.start_time = None
         self.start_time: datetime
         self.logger = get_logger("SER.Core.ProgressTracker")
         self.progress_bar = progress_bar
         self.progress_label = progress_label
-        self.amount = amount
+        self.amount = 0
         self.index = 0
 
-        progress_bar.setRange(0, amount)
-        progress_bar.setValue(0)
-
-    def start(self):
+    def start(self, amount: int):
+        self.amount = amount
+        self.progress_bar.setRange(0, amount)
+        self.progress_bar.setValue(0)
         self.start_time = datetime.now()
         self.progress_label.setText(f"0/{self.amount}")
 

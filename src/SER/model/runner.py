@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Collection, Callable
 
 from lantz.core.log import get_logger
@@ -46,11 +47,19 @@ class ExperimentRunner(LogMixin):
 
         while self.arg_tracker.advance():
             self.data.next()
+            config_time_start = datetime.now()
             self.dispatcher.execute()
+            observe_time_start = datetime.now()
 
             for comp in self.observe_comp:
                 self.wrap_fun(comp.name, comp.component.instrument.observe)()
                 self.dispatcher.execute()
+
+            self.data.add_datum("timestamp", {
+                "config_start_time": config_time_start,
+                "observe_start_time": observe_time_start,
+                "end_time": datetime.now()
+            })
 
             if iteration_callback:
                 iteration_callback()

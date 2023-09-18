@@ -2,9 +2,8 @@ from src.SER.interfaces import Component
 from .rand_value import RandValInstrument, RandValConfUi
 
 
-def create_component() -> Component:
-    comp = Component()
-    comp.instrument = RandValInstrument()
-    comp.conf_ui = RandValConfUi(backend=comp.instrument)
-    comp.run_ui = None
-    return comp
+class RandValue(Component):
+    def __init__(self):
+        self.instrument = RandValInstrument()
+        self.conf_ui = RandValConfUi(backend=self.instrument)
+        self.run_ui = None

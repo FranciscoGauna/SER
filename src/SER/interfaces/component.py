@@ -12,18 +12,13 @@ class Component:
 
 
 class ComponentInitialization:
-    component = Component
 
-    def __init__(self, constructor: Callable[[], Component], coupling: int, x: int, y: int, name: str = None):
-        self.constructor = constructor
+    def __init__(self, component: Component, coupling: int, x: int, y: int, name: str = None):
+        self.component = component
         self.coupling = coupling
         self.x = x
         self.y = y
         if name is None:
-            self.name = str(constructor.__name__)
+            self.name = type(component).__name__
         else:
             self.name = name
-
-    def initialize(self):
-        self.component = self.constructor()
-        return self.component

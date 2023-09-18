@@ -4,6 +4,7 @@ from typing import Collection
 from logging import getLogger as get_logger
 
 from PyQt5 import uic
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QGroupBox, QGridLayout, QPushButton, QProgressBar, QLabel, QStackedWidget
 from pimpmyclass.mixins import LogMixin
 
@@ -13,6 +14,7 @@ from ..model.runner import ExperimentRunner
 
 
 class MainWidget(QStackedWidget, LogMixin):
+    progress_changed = pyqtSignal()
     conf_layout: QGridLayout
     run_layout: QGridLayout
     data_layout: QGridLayout
@@ -64,7 +66,8 @@ class MainWidget(QStackedWidget, LogMixin):
 
     def load_run_gui(self):
         self.log_debug(msg="Started loading run interface")
-        self.progress_tracker = ProgressTracker(self.progress_bar, self.progress_label, self.runner.point_amount())
+        self.progress_tracker = ProgressTracker(self.progress_bar, self.progress_label)
+        self.progress_changed.connect(self.progress_tracker.advance)
 
     def load_data_gui(self):
         self.log_debug(msg="Started loading data interface")
@@ -78,10 +81,10 @@ class MainWidget(QStackedWidget, LogMixin):
             self.started = True
             self.log_debug(msg="Changing interface to the experiment interface")
             self.setCurrentWidget(self.run_page)
+            self.progress_tracker.start(self.runner.arg_tracker.points_amount())
             self.run_thread.start()
 
     def run_experiment(self):
-        self.progress_tracker.start()
-        self.runner.run_experiment(self.progress_tracker.advance)
         self.log_debug(msg="Changing interface to the data interface")
+        self.runner.run_experiment(self.progress_changed.emit)
         self.setCurrentWidget(self.data_page)
