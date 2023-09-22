@@ -29,6 +29,7 @@ class MainWidget(QStackedWidget, LogMixin):
     progress_label: QLabel
 
     data_table: QTableView
+    data_model: TableModel
 
     conf_page: QStackedWidget
     run_page: QStackedWidget
