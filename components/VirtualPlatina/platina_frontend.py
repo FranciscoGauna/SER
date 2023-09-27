@@ -13,7 +13,7 @@ class PointSelectBackend(ConfigurableInstrument):
     """
 
     def configure(self, x, y):
-        sleep(0.01)
+        sleep(0.1)
         self.log_debug("Finished configuration")
         return {"x": x, "y": y}
 
@@ -95,6 +95,9 @@ class PointSelectFrontend(ConfigurationUI):
         for x in range(self.backend.x_amount):
             for y in range(self.backend.y_amount):
                 yield self.backend.x_init + x * x_delta, self.backend.y_init + y * y_delta
+
+    def x_amount(self): return self.backend.x_amount
+    def y_amount(self): return self.backend.y_amount
 
     def point_amount(self) -> int:
         return self.backend.x_amount * self.backend.y_amount

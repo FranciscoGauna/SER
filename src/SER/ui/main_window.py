@@ -10,7 +10,7 @@ from pimpmyclass.mixins import LogMixin
 
 from .data_table import TableModel
 from .progress_tracker import ProgressTracker
-from ..interfaces import ComponentInitialization
+from ..interfaces import ComponentInitialization, ProcessDataUI, FinalDataUI
 from ..model.runner import ExperimentRunner
 
 
@@ -40,7 +40,8 @@ class MainWidget(QStackedWidget, LogMixin):
     progress_box: QGroupBox
     data_box: QGroupBox
 
-    def __init__(self, components: Collection[ComponentInitialization], runner: ExperimentRunner):
+    def __init__(self, components: Collection[ComponentInitialization], run_data_ui: Collection[ProcessDataUI],
+                 final_data_ui: Collection[FinalDataUI], runner: ExperimentRunner):
         super().__init__()
 
         # This loads the file and loads up each object as part of this class
@@ -61,9 +62,12 @@ class MainWidget(QStackedWidget, LogMixin):
         self.run_layout = self.run_box.layout()
         self.data_layout = self.data_box.layout()
 
+        # Storing and loading UI only components
+        self.run_data_ui = run_data_ui
+        self.final_data_ui = final_data_ui
+
         self.load_config_gui()
         self.load_run_gui()
-        self.load_data_gui()
 
         # Connecting Slots
         self.progress_changed.connect(self.progress_change)
@@ -85,9 +89,13 @@ class MainWidget(QStackedWidget, LogMixin):
     def load_run_gui(self):
         self.log_debug(msg="Started loading run interface")
         self.progress_tracker = ProgressTracker(self.progress_bar, self.progress_label)
+        for ui in self.run_data_ui:
+            self.run_layout.addWidget(ui, ui.x, ui.y)
 
     def load_data_gui(self):
         self.log_debug(msg="Started loading data interface")
+        for ui in self.final_data_ui:
+            self.data_layout.addWidget(ui, ui.x, ui.y)
 
     def start_experiment(self):
         """
@@ -107,15 +115,21 @@ class MainWidget(QStackedWidget, LogMixin):
         self.progress_ended.emit()
 
     def progress_start(self):
+        self.progress_index = 0
         self.progress_tracker.start(self.runner.arg_tracker.points_amount())
+        for run_ui in self.run_data_ui:
+            run_ui.initialize()
 
     @pyqtSlot()
     def progress_change(self):
         self.progress_tracker.advance()
-        # We also execute here the advancements of the data class
+        for run_ui in self.run_data_ui:
+            run_ui.set_datum(self.runner.data.get_datum_index(self.progress_index))
+        self.progress_index += 1
 
     @pyqtSlot()
     def progress_end(self):
         self.data_model = TableModel(self.runner.data.to_dataframe())
         self.data_table.setModel(self.data_model)
+        self.load_data_gui()
         self.setCurrentWidget(self.data_page)

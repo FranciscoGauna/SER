@@ -17,6 +17,9 @@ class DataRepository(LogMixin):
     def add_datum(self, name: str, datum: Dict[str, Any]):
         self.data[-1][name] = datum
 
+    def get_datum_index(self, index):
+        return self.data[index]
+
     def to_dataframe(self) -> pd.DataFrame:
         header: set[Tuple[str, str]] = set()
         for item in self.data:

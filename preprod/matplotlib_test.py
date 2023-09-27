@@ -5,14 +5,14 @@ import numpy as np
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QVBoxLayout, QSpinBox
 
-matplotlib.use('Qt5Agg')
-
 from PyQt5 import QtCore, QtWidgets, uic
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import Colormap
+
+matplotlib.use('Qt5Agg')
 
 
 class HSVMapper(Colormap):
@@ -24,7 +24,6 @@ class HSVMapper(Colormap):
 
     def __call__(self, X: float | np.ndarray, alpha: float | None = ..., bytes: bool = False) \
             -> tuple[float, float, float, float] | np.ndarray:
-
         rgb_value = []
 
         xa = np.array(X, copy=True)
@@ -60,8 +59,6 @@ class MplCanvas(FigureCanvas):
         fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = fig.add_subplot(111)
         super(MplCanvas, self).__init__(fig)
-
-
 
 
 class MainWindow(QtWidgets.QGroupBox):

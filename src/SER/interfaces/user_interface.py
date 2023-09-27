@@ -1,6 +1,7 @@
-from typing import Union, Generator, Collection, Dict
+from typing import Union, Generator, Collection, Dict, Any
 from abc import abstractmethod
 
+from lantz.core.log import get_logger
 from lantz.qt import Frontend
 
 from . import Instrument
@@ -15,6 +16,8 @@ class ConfigurationUI(Frontend):
 
     def __init__(self, parent=None, backend=None):
         super().__init__(parent, backend)
+        self.logger_name = 'SER.UI.ConfigurationUI.' + str(self)
+        self.logger = get_logger(self.logger_name)
 
     @abstractmethod
     def get_points(self) -> Generator:
@@ -44,6 +47,8 @@ class ProcessUI(Frontend):
 
     def __init__(self, parent=None, backend=None):
         super().__init__(parent, backend)
+        self.logger_name = 'SER.UI.ProcessUI.' + str(self)
+        self.logger = get_logger(self.logger_name)
 
     @abstractmethod
     def set_result(self, *args):
@@ -57,23 +62,43 @@ class ProcessDataUI(Frontend):
     # This is a recommendation, you can rename the instrument to something else
     instrument: Instrument
 
-    def __init__(self, parent=None, backend=None):
+    # These are used by the gui to load its position
+    x: int
+    y: int
+
+    def __init__(self, x, y, parent=None, backend=None):
         super().__init__(parent, backend)
+        self.logger_name = 'SER.UI.ProcessDataUI.' + str(self)
+        self.logger = get_logger(self.logger_name)
+        self.x = x
+        self.y = y
 
     @abstractmethod
-    def set_datum(self, components: Dict[str, Collection]):
+    def initialize(self):
+        raise NotImplementedError("The function initialize was not implemented")
+
+    @abstractmethod
+    def set_datum(self, components: Dict[str, Dict[str, Any]]):
         raise NotImplementedError("The function set_result was not implemented")
 
 
 class FinalDataUI(Frontend):
-    """This class represents the User Interface that displays the data from experiment. Once it has concluded"""
+    """This class represents the User Interface that displays the data from experiment, once it has concluded"""
 
     # This is a recommendation, you can rename the instrument to something else
     instrument: Instrument
 
-    def __init__(self, parent=None, backend=None):
+    # These are used by the gui to load its position
+    x: int
+    y: int
+
+    def __init__(self, x, y, parent=None, backend=None):
         super().__init__(parent, backend)
+        self.logger_name = 'SER.UI.FinalDataUI.' + str(self)
+        self.logger = get_logger(self.logger_name)
+        self.x = x
+        self.y = y
 
     @abstractmethod
-    def set_data(self, components: Dict[str, Collection]):
+    def set_data(self, components: Dict[str, Dict[str, Any]]):
         raise NotImplementedError("The function set_result was not implemented")
