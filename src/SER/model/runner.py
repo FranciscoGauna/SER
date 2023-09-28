@@ -30,7 +30,7 @@ class ExperimentRunner(LogMixin):
         generators = [
             (
                 comp.coupling,
-                comp.component.conf_ui.get_points,
+                comp.component.instrument.get_points,
                 self.wrap_fun(comp.name, comp.component.instrument.configure)
             )
             for comp in configurable_components
@@ -42,9 +42,7 @@ class ExperimentRunner(LogMixin):
         wrapped_fun = lambda *args: self.data.add_datum(name, fun(*args))
         return self.dispatcher.wrap(wrapped_fun)
 
-    def run_experiment(self, iteration_callback: Callable = None):
-        self.log_info("Starting Experiment")
-
+    def _run_experiment(self, iteration_callback: Callable = None):
         while self.arg_tracker.advance():
             self.data.next()
             config_time_start = datetime.now()
@@ -64,6 +62,11 @@ class ExperimentRunner(LogMixin):
             if iteration_callback:
                 iteration_callback()
             self.log_debug("Advanced one iteration")
+
+    def run_experiment(self, iteration_callback: Callable = None):
+        self.log_info("Starting Experiment")
+
+        self._run_experiment(iteration_callback)
 
         # TODO: Remove this forced print to file
         self.data.to_csv("output.csv")

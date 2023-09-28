@@ -8,6 +8,7 @@ from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QGroupBox, QGridLayout, QPushButton, QProgressBar, QLabel, QStackedWidget, QTableView
 from pimpmyclass.mixins import LogMixin
 
+from .components_dialog import ComponentsDialog
 from .data_table import TableModel
 from .progress_tracker import ProgressTracker
 from ..interfaces import ComponentInitialization, ProcessDataUI, FinalDataUI
@@ -23,6 +24,8 @@ class MainWidget(QStackedWidget, LogMixin):
     data_layout: QGridLayout
 
     start_button: QPushButton
+    load_conf_button: QPushButton
+    configuration_dialog: ComponentsDialog
 
     progress_tracker: ProgressTracker
     progress_bar: QProgressBar
@@ -41,7 +44,7 @@ class MainWidget(QStackedWidget, LogMixin):
     data_box: QGroupBox
 
     def __init__(self, components: Collection[ComponentInitialization], run_data_ui: Collection[ProcessDataUI],
-                 final_data_ui: Collection[FinalDataUI], runner: ExperimentRunner):
+                 final_data_ui: Collection[FinalDataUI], runner: ExperimentRunner, conf_folder="."):
         super().__init__()
 
         # This loads the file and loads up each object as part of this class
@@ -66,7 +69,7 @@ class MainWidget(QStackedWidget, LogMixin):
         self.run_data_ui = run_data_ui
         self.final_data_ui = final_data_ui
 
-        self.load_config_gui()
+        self.load_config_gui(conf_folder)
         self.load_run_gui()
 
         # Connecting Slots
@@ -75,7 +78,7 @@ class MainWidget(QStackedWidget, LogMixin):
 
         self.show()
 
-    def load_config_gui(self):
+    def load_config_gui(self, conf_folder):
         self.log_debug(msg="Started loading configuration interface")
         max_x = 0
         max_y = 0
@@ -85,6 +88,8 @@ class MainWidget(QStackedWidget, LogMixin):
             max_y = max(max_y, component.y)
         self.start_button.pressed.connect(self.start_experiment)
         self.setCurrentWidget(self.conf_page)
+        self.configuration_dialog = ComponentsDialog(self.components, conf_folder)
+        self.load_conf_button.pressed.connect(self.configuration_dialog.show)
 
     def load_run_gui(self):
         self.log_debug(msg="Started loading run interface")

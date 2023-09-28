@@ -17,7 +17,7 @@ def launch_app(
         final_data_ui: Collection[FinalDataUI]
 ):
     # TODO: Parametrize logging
-    log_to_socket(logging.DEBUG, "127.0.0.1", 19996)
+    # log_to_socket(logging.DEBUG, "127.0.0.1", 19996)
     LOGGER.log(logging.DEBUG, "Starting Framework")
 
     # The main interface that has the code to start the experiment

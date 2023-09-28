@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>RandValue</class>
+ <widget class="QGroupBox" name="RandValue">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,15 +11,12 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>GroupBox</string>
+  </property>
+  <property name="title">
+   <string>RandValue</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
-    <widget class="QDoubleSpinBox" name="min_spin_box"/>
-   </item>
-   <item row="1" column="1">
-    <widget class="QDoubleSpinBox" name="max_spin_box"/>
-   </item>
    <item row="0" column="0">
     <widget class="QLabel" name="min_label">
      <property name="text">
@@ -33,6 +30,12 @@
       <string>Max</string>
      </property>
     </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QDoubleSpinBox" name="min_spin_box"/>
+   </item>
+   <item row="1" column="1">
+    <widget class="QDoubleSpinBox" name="max_spin_box"/>
    </item>
   </layout>
  </widget>

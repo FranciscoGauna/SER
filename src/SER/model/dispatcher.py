@@ -1,8 +1,23 @@
+from os import environ
+from cProfile import runctx
 from typing import Callable, List, Tuple, Any, Collection, Dict
 from concurrent.futures import ThreadPoolExecutor
 
 from lantz.core.log import get_logger
 from pimpmyclass.mixins import LogMixin
+
+counter = 0
+
+
+def execute_fun(task: tuple[callable, Any, ...]):
+    # TODO: documentar esta linea
+    if environ.get("ENABLE_PROFILING"):
+        global counter
+        filename = f"profiling/dispatcher_{counter}.profile"
+        counter += 1
+        return runctx("task[0](*task[1])", {}, {"task": task}, filename=filename)
+    else:
+        return task[0](*task[1])
 
 
 class Dispatcher(LogMixin):
@@ -20,7 +35,7 @@ class Dispatcher(LogMixin):
 
     def execute(self) -> Collection[Tuple[str, Dict[str, Any]]]:
         with ThreadPoolExecutor() as executor:
-            futures = [executor.submit(task[0], *task[1]) for task in self.tasks]
+            futures = [executor.submit(execute_fun, task) for task in self.tasks]
         self.tasks.clear()
 
         return [f.result() for f in futures]
