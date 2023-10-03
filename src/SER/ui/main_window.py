@@ -16,7 +16,6 @@ from ..model.runner import ExperimentRunner
 
 
 class MainWidget(QStackedWidget, LogMixin):
-    progress_changed = pyqtSignal()
     progress_ended = pyqtSignal()
 
     conf_layout: QGridLayout
@@ -77,7 +76,6 @@ class MainWidget(QStackedWidget, LogMixin):
         self.load_run_gui()
 
         # Connecting Slots
-        self.progress_changed.connect(self.progress_change)
         self.progress_ended.connect(self.progress_end)
 
         self.show()
