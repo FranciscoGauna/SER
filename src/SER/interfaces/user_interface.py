@@ -1,4 +1,4 @@
-from typing import Union, Generator, Collection, Dict, Any
+from typing import Union, Generator, Collection, Dict, Any, List
 from abc import abstractmethod
 
 from lantz.core.log import get_logger
@@ -61,7 +61,7 @@ class ProcessDataUI(Frontend):
         raise NotImplementedError("The function initialize was not implemented")
 
     @abstractmethod
-    def set_datum(self, components: Dict[str, Dict[str, Any]]):
+    def add_data(self, data: List[Dict[str, Dict[str, Any]]]):
         raise NotImplementedError("The function set_result was not implemented")
 
 
@@ -83,5 +83,5 @@ class FinalDataUI(Frontend):
         self.y = y
 
     @abstractmethod
-    def set_data(self, components: Dict[str, Dict[str, Any]]):
+    def set_data(self, data: List[Dict[str, Dict[str, Any]]]):
         raise NotImplementedError("The function set_result was not implemented")

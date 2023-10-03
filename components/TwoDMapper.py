@@ -36,26 +36,28 @@ class TwoDMapper(ProcessDataUI):
         self.canvas = PlotCanvas(self.data)
         self.setCentralWidget(self.canvas)
 
-    def set_datum(self, components: Dict[str, Dict[str, Any]]):
-        if self.motor_name not in components:
-            return
+    def add_data(self, data: List[Dict[str, Dict[str, Any]]]):
+        for datum in data:
+            if self.motor_name not in datum:
+                return
 
-        if self.value_name[0] in components:
-            self.last_value = components[self.value_name[0]][self.value_name[1]]
+            if self.value_name[0] in datum:
+                self.last_value = datum[self.value_name[0]][self.value_name[1]]
 
-        x = components[self.motor_name]["x"]
-        y = components[self.motor_name]["y"]
+            x = datum[self.motor_name]["x"]
+            y = datum[self.motor_name]["y"]
 
-        if self.x_counter >= self.width:
-            self.x_counter = 0
-            self.y_counter += 1
+            if self.x_counter >= self.width:
+                self.x_counter = 0
+                self.y_counter += 1
 
-        # TODO: remove ugly hack
-        time_delta: timedelta = components["timestamp"]["end_time"] - components["timestamp"]["config_start_time"]
-        self.data[self.y_counter][self.x_counter] = time_delta.total_seconds()
+            # TODO: remove ugly hack
+            time_delta: timedelta = datum["timestamp"]["end_time"] - datum["timestamp"]["config_start_time"]
+            self.data[self.y_counter][self.x_counter] = time_delta.total_seconds()
+
+            self.x_counter += 1
         self.canvas.update_with_data(self.data)
 
-        self.x_counter += 1
 
 
 class PlotCanvas(FigureCanvasQTAgg):

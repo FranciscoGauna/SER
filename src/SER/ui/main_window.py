@@ -1,10 +1,10 @@
 from os import path
-from threading import Thread
+from threading import Thread, Lock
 from typing import Collection
 from logging import getLogger as get_logger
 
 from PyQt5 import uic
-from PyQt5.QtCore import pyqtSignal, pyqtSlot
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, QTimer
 from PyQt5.QtWidgets import QGroupBox, QGridLayout, QPushButton, QProgressBar, QLabel, QStackedWidget, QTableView
 from pimpmyclass.mixins import LogMixin
 
@@ -30,6 +30,10 @@ class MainWidget(QStackedWidget, LogMixin):
     progress_tracker: ProgressTracker
     progress_bar: QProgressBar
     progress_label: QLabel
+
+    progress_timer: QTimer
+    progress_list: list  # This stores the value of each datum that has been added since the last iteration
+    progress_lock: Lock
 
     data_table: QTableView
     data_model: TableModel
@@ -116,21 +120,40 @@ class MainWidget(QStackedWidget, LogMixin):
 
     def run_experiment(self):
         self.log_debug(msg="Changing interface to the data interface")
-        self.runner.run_experiment(self.progress_changed.emit)
+        self.runner.run_experiment(self.progress_change)
         self.progress_ended.emit()
 
     def progress_start(self):
-        self.progress_index = 0
+        self.progress_list = []
+        self.progress_lock = Lock()
+        QTimer().singleShot(50, self.progress_update)
         self.progress_tracker.start(self.runner.arg_tracker.points_amount())
         for run_ui in self.run_data_ui:
             run_ui.initialize()
 
-    @pyqtSlot()
     def progress_change(self):
+        # The lock ensures that we never add data to a list in the middle of being passed to another
+        self.progress_lock.acquire()
+        self.progress_list.append(self.runner.data.data[-1])
+        self.progress_lock.release()
+
+    #@pyqtSlot()
+    def progress_update(self):
+        # Assignment operations are atomic, but we want to ensure that delta list isn't modified during the update
+        self.progress_lock.acquire()
+        delta_list = self.progress_list
+        self.progress_list = []
+        self.progress_lock.release()
+
+        # Now that we have thread safe data, we update the run_ui which the data since the last iteration
         self.progress_tracker.advance()
         for run_ui in self.run_data_ui:
-            run_ui.set_datum(self.runner.data.get_datum_index(self.progress_index))
-        self.progress_index += 1
+            run_ui.add_data(delta_list)
+
+        if not self.runner.stopped:
+            QTimer().singleShot(50, self.progress_update)
+        elif len(self.progress_list) > 0:
+            QTimer().singleShot(50, self.progress_update)
 
     @pyqtSlot()
     def progress_end(self):

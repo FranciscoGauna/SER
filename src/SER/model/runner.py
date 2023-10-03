@@ -37,13 +37,16 @@ class ExperimentRunner(LogMixin):
         ]
 
         self.arg_tracker = MetaArgTracker(generators)
+        self.stopped = False
 
     def wrap_fun(self, name, fun):
         wrapped_fun = lambda *args: self.data.add_datum(name, fun(*args))
         return self.dispatcher.wrap(wrapped_fun)
 
-    def _run_experiment(self, iteration_callback: Callable = None):
-        while self.arg_tracker.advance():
+    def run_experiment(self, iteration_callback: Callable = None):
+        self.log_info("Starting Experiment")
+
+        while not self.stopped and self.arg_tracker.advance():
             self.data.next()
             config_time_start = datetime.now()
             self.dispatcher.execute()
@@ -63,10 +66,7 @@ class ExperimentRunner(LogMixin):
                 iteration_callback()
             self.log_debug("Advanced one iteration")
 
-    def run_experiment(self, iteration_callback: Callable = None):
-        self.log_info("Starting Experiment")
-
-        self._run_experiment(iteration_callback)
+        self.stopped = True
 
         # TODO: Remove this forced print to file
         self.data.to_csv("output.csv")
