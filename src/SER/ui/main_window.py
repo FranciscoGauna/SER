@@ -26,6 +26,7 @@ class MainWidget(QStackedWidget, LogMixin):
     load_conf_button: QPushButton
     configuration_dialog: ComponentsDialog
 
+    run_stop_button:QPushButton
     progress_tracker: ProgressTracker
     progress_bar: QProgressBar
     progress_label: QLabel
@@ -96,6 +97,7 @@ class MainWidget(QStackedWidget, LogMixin):
     def load_run_gui(self):
         self.log_debug(msg="Started loading run interface")
         self.progress_tracker = ProgressTracker(self.progress_bar, self.progress_label)
+        self.run_stop_button.pressed.connect(self.stop_experiment)
         for ui in self.run_data_ui:
             self.run_layout.addWidget(ui, ui.x, ui.y)
 
@@ -120,6 +122,10 @@ class MainWidget(QStackedWidget, LogMixin):
         self.log_debug(msg="Changing interface to the data interface")
         self.runner.run_experiment(self.progress_change)
         self.progress_ended.emit()
+
+    def stop_experiment(self):
+        self.log_info(msg="Stopping the experiment prematurely with the button")
+        self.runner.stopped = True  # Assignment is atomic
 
     def progress_start(self):
         self.progress_list = []
