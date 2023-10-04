@@ -5,7 +5,8 @@ from logging import getLogger as get_logger
 
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QTimer
-from PyQt5.QtWidgets import QGroupBox, QGridLayout, QPushButton, QProgressBar, QLabel, QStackedWidget, QTableView
+from PyQt5.QtWidgets import QGroupBox, QGridLayout, QPushButton, QProgressBar, QLabel, QStackedWidget, QTableView, \
+    QFileDialog
 from pimpmyclass.mixins import LogMixin
 
 from .components_dialog import ComponentsDialog
@@ -35,6 +36,8 @@ class MainWidget(QStackedWidget, LogMixin):
     progress_list: list  # This stores the value of each datum that has been added since the last iteration
     progress_lock: Lock
 
+    data_save_mat_button: QPushButton
+    data_save_csv_button: QPushButton
     data_table: QTableView
     data_model: TableModel
 
@@ -48,7 +51,7 @@ class MainWidget(QStackedWidget, LogMixin):
     data_box: QGroupBox
 
     def __init__(self, components: Collection[ComponentInitialization], run_data_ui: Collection[ProcessDataUI],
-                 final_data_ui: Collection[FinalDataUI], runner: ExperimentRunner, conf_folder="."):
+                 final_data_ui: Collection[FinalDataUI], runner: ExperimentRunner, conf_folder=".", out_folder="."):
         super().__init__()
 
         # This loads the file and loads up each object as part of this class
@@ -75,6 +78,7 @@ class MainWidget(QStackedWidget, LogMixin):
 
         self.load_config_gui(conf_folder)
         self.load_run_gui()
+        self.out_folder = out_folder
 
         # Connecting Slots
         self.progress_ended.connect(self.progress_end)
@@ -103,6 +107,8 @@ class MainWidget(QStackedWidget, LogMixin):
 
     def load_data_gui(self):
         self.log_debug(msg="Started loading data interface")
+        self.data_save_mat_button.pressed.connect(self.export_to_matlab)
+        self.data_save_csv_button.pressed.connect(self.export_to_csv)
         for ui in self.final_data_ui:
             self.data_layout.addWidget(ui, ui.x, ui.y)
 
@@ -127,6 +133,7 @@ class MainWidget(QStackedWidget, LogMixin):
         self.log_info(msg="Stopping the experiment prematurely with the button")
         self.runner.stopped = True  # Assignment is atomic
 
+    # TODO: Considerar mover esto a una clase propia
     def progress_start(self):
         self.progress_list = []
         self.progress_lock = Lock()
@@ -141,7 +148,6 @@ class MainWidget(QStackedWidget, LogMixin):
         self.progress_list.append(self.runner.data.data[-1])
         self.progress_lock.release()
 
-    #@pyqtSlot()
     def progress_update(self):
         # Assignment operations are atomic, but we want to ensure that delta list isn't modified during the update
         self.progress_lock.acquire()
@@ -165,3 +171,23 @@ class MainWidget(QStackedWidget, LogMixin):
         self.data_table.setModel(self.data_model)
         self.load_data_gui()
         self.setCurrentWidget(self.data_page)
+
+    def export_to_csv(self):
+        options = QFileDialog.Options()
+        file_dialog = QFileDialog()
+        file_dialog.setDirectory(self.out_folder)
+        file_name, _ = file_dialog.getSaveFileName(self, "Save File", "",
+                                                   "Comma-separated values (*.csv);;All Files (*)", options=options)
+
+        if file_name:
+            self.runner.data.to_csv(file_name)
+
+    def export_to_matlab(self):
+        options = QFileDialog.Options()
+        file_dialog = QFileDialog()
+        file_dialog.setDirectory(self.out_folder)
+        file_name, _ = file_dialog.getSaveFileName(self, "Save File", "",
+                                                   "MAT-file (*.MAT);;All Files (*)", options=options)
+
+        if file_name:
+            self.runner.data.to_matlab(file_name)

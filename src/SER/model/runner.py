@@ -68,8 +68,6 @@ class ExperimentRunner(LogMixin):
 
         self.stopped = True
 
-        # TODO: Remove this forced print to file
-        self.data.to_csv("output.csv")
         self.log_info("Ending Experiment")
 
     def point_amount(self) -> int:

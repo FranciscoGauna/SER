@@ -2,6 +2,7 @@ from typing import List, Dict, Tuple, Any
 
 from lantz.core.log import get_logger
 from pimpmyclass.mixins import LogMixin
+from scipy.io import savemat
 import pandas as pd
 
 
@@ -43,5 +44,11 @@ class DataRepository(LogMixin):
         return df[sorted(df.columns)]
 
     def to_csv(self, filename: str):
-        # TODO: rethink if this is the proper file structure
         self.to_dataframe().to_csv(filename)
+
+    def to_matlab(self, filename: str):
+        df = self.to_dataframe()
+        mat_dict = {}
+        for column in df.columns:
+            mat_dict[column] = df[column].to_numpy(copy=True)
+        savemat(filename, mat_dict)
