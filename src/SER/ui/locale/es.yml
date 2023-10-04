@@ -1,0 +1,3 @@
+progress_label: "{}/{}\t Tiempo Transcurrido: {}\t Tiempo Restante: {}"
+load_configuration: "Cargar Configuracion"
+start_experiment: "Comenzar Experimento"

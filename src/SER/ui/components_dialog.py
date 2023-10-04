@@ -3,8 +3,9 @@ from typing import Collection, List
 from configparser import ConfigParser
 
 from PyQt5 import uic
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QDialog, QLabel, QPushButton, QFileDialog
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QDialog, QLabel, QPushButton, QFileDialog, QDialogButtonBox
 
+from .localization import localizator
 from ..interfaces import ComponentInitialization
 
 
@@ -28,6 +29,10 @@ class ComponentConfigWidget(QWidget):
         self.name_label.setText(f"{component.component.__class__.__name__}: {component.name}")
         self.load_button.pressed.connect(self.load_configuration)
         self.save_button.pressed.connect(self.save_configuration)
+
+        # Text
+        self.load_button.setText(localizator.get("load_configuration"))
+        self.save_button.setText(localizator.get("save_configuration"))
 
     def load_configuration(self):
         options = QFileDialog.Options()
@@ -57,6 +62,7 @@ class ComponentConfigWidget(QWidget):
 class ComponentsDialog(QDialog):
     components_layout: QVBoxLayout
     components_widgets: List[ComponentConfigWidget]
+    button_box: QDialogButtonBox
 
     def __init__(self, components: Collection[ComponentInitialization], folder="."):
         super().__init__()

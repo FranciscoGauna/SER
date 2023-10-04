@@ -1,0 +1,14 @@
+# Conf
+load_configuration: "Load Configuration"
+save_configuration: "Save Configuration"
+start_experiment: "Start Experiment"
+configuration: "Configuration"
+
+# Run
+running: "Running"
+progress: "Progress"
+progress_label: "{}/{}\t Time Elapsed: {}\t Time Remaining: {}"
+stop: "STOP"
+
+# Data
+data: "Data"

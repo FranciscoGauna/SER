@@ -11,8 +11,10 @@ from pimpmyclass.mixins import LogMixin
 
 from .components_dialog import ComponentsDialog
 from .data_table import TableModel
+from .localization import localizator
 from .progress_tracker import ProgressTracker
 from ..interfaces import ComponentInitialization, ProcessDataUI, FinalDataUI
+from ..model.documentation import to_md, to_htm
 from ..model.runner import ExperimentRunner
 
 
@@ -27,7 +29,7 @@ class MainWidget(QStackedWidget, LogMixin):
     load_conf_button: QPushButton
     configuration_dialog: ComponentsDialog
 
-    run_stop_button:QPushButton
+    run_stop_button: QPushButton
     progress_tracker: ProgressTracker
     progress_bar: QProgressBar
     progress_label: QLabel
@@ -36,6 +38,8 @@ class MainWidget(QStackedWidget, LogMixin):
     progress_list: list  # This stores the value of each datum that has been added since the last iteration
     progress_lock: Lock
 
+    data_save_docs_htm_button: QPushButton
+    data_save_docs_mkd_button: QPushButton
     data_save_mat_button: QPushButton
     data_save_csv_button: QPushButton
     data_table: QTableView
@@ -98,6 +102,11 @@ class MainWidget(QStackedWidget, LogMixin):
         self.configuration_dialog = ComponentsDialog(self.components, conf_folder)
         self.load_conf_button.pressed.connect(self.configuration_dialog.show)
 
+        # Text
+        self.load_conf_button.setText(localizator.get("load_configuration"))
+        self.start_button.setText(localizator.get("start_experiment"))
+        self.conf_box.setTitle(localizator.get("configuration"))
+
     def load_run_gui(self):
         self.log_debug(msg="Started loading run interface")
         self.progress_tracker = ProgressTracker(self.progress_bar, self.progress_label)
@@ -105,12 +114,26 @@ class MainWidget(QStackedWidget, LogMixin):
         for ui in self.run_data_ui:
             self.run_layout.addWidget(ui, ui.x, ui.y)
 
+        # Text
+        self.run_box.setTitle(localizator.get("running"))
+        self.progress_box.setTitle(localizator.get("progress"))
+        self.run_stop_button.setText(localizator.get("stop"))
+
     def load_data_gui(self):
         self.log_debug(msg="Started loading data interface")
+        self.data_save_docs_htm_button.pressed.connect(self.export_docs_to_htm)
+        self.data_save_docs_mkd_button.pressed.connect(self.export_docs_to_md)
         self.data_save_mat_button.pressed.connect(self.export_to_matlab)
         self.data_save_csv_button.pressed.connect(self.export_to_csv)
         for ui in self.final_data_ui:
             self.data_layout.addWidget(ui, ui.x, ui.y)
+
+        # Text
+        self.data_box.setTitle(localizator.get("data"))
+        self.data_save_csv_button.setMask(localizator.get("Save as csv"))
+        self.data_save_mat_button.setMask(localizator.get("Save as MAT"))
+        self.data_save_docs_mkd_button.setMask(localizator.get("Save docs as Markdown"))
+        self.data_save_docs_htm_button.setMask(localizator.get("Save docs as HTML"))
 
     def start_experiment(self):
         """
@@ -191,3 +214,23 @@ class MainWidget(QStackedWidget, LogMixin):
 
         if file_name:
             self.runner.data.to_matlab(file_name)
+
+    def export_docs_to_htm(self):
+        options = QFileDialog.Options()
+        file_dialog = QFileDialog()
+        file_dialog.setDirectory(self.out_folder)
+        file_name, _ = file_dialog.getSaveFileName(self, "Save File", "",
+                                                   "HyperText Markup Language (*.html);;All Files (*)", options=options)
+
+        if file_name:
+            to_htm(file_name, self.components)
+
+    def export_docs_to_md(self):
+        options = QFileDialog.Options()
+        file_dialog = QFileDialog()
+        file_dialog.setDirectory(self.out_folder)
+        file_name, _ = file_dialog.getSaveFileName(self, "Save File", "",
+                                                   "Markdown (*.md);;All Files (*)", options=options)
+
+        if file_name:
+            to_md(file_name, self.components)

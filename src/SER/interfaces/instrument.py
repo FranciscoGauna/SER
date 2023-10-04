@@ -21,6 +21,12 @@ class Instrument(Backend):
     def set_config(self, config: ConfigParser):
         raise NotImplementedError("The method observe has not been implemented")
 
+    @abstractmethod
+    def variable_documentation(self) -> Dict[str, str]:
+        """This method should return a string containing the documentation for each kind of variable, including
+        what it represents, what is the range of value and what is the unit."""
+        raise NotImplementedError("The method variable_documentation has not been implemented")
+
 
 class ObservableInstrument(Instrument):
 

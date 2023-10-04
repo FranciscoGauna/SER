@@ -1,3 +1,4 @@
+from configparser import ConfigParser
 from random import random
 from typing import Union, Generator, List, Dict, Any
 
@@ -7,6 +8,19 @@ from src.SER.interfaces import ConfigurationUI, ObservableInstrument
 
 
 class RandValInstrument(ObservableInstrument):
+
+    def variable_documentation(self) -> Dict[str, str]:
+        return {"val": f"This represents a random value in the {self.min}-{self.max} range"}
+
+    def get_config(self) -> ConfigParser:
+        config = ConfigParser()
+        config["min"] = self.min
+        config["max"] = self.max
+        return config
+
+    def set_config(self, config: ConfigParser):
+        self.min = float(config["min"])
+        self.max = float(config["max"])
 
     def __init__(self, **instruments_and_backends):
         super().__init__(**instruments_and_backends)

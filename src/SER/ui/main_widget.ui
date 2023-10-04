@@ -135,6 +135,20 @@
     <item row="5" column="0">
      <layout class="QHBoxLayout" name="data_button_layout">
       <item>
+       <widget class="QPushButton" name="data_save_docs_htm_button">
+        <property name="text">
+         <string>Variable Documentation (html)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="data_save_docs_mkd_button">
+        <property name="text">
+         <string>Variable Documentation (markdown)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="data_button_spacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>

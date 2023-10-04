@@ -8,6 +8,8 @@ from PyQt5.QtWidgets import QGroupBox, QLabel, QProgressBar
 from PyQt5.QtCore import pyqtSignal
 from pimpmyclass.mixins import LogMixin
 
+from src.SER.ui.localization import localizator
+
 
 class ProgressTracker(LogMixin):
 
@@ -26,14 +28,14 @@ class ProgressTracker(LogMixin):
         self.progress_bar.setRange(0, amount)
         self.progress_bar.setValue(0)
         self.start_time = datetime.now()
-        self.progress_label.setText(f"0/{self.amount}")
+        self.progress_label.setText(f"0/{self.amount}")  # No Locale because it's only numeric
 
     def advance(self):
         self.index += 1
         self.progress_bar.setValue(self.index)
         time_elapsed = datetime.now() - self.start_time
         time_remaining = time_elapsed * ((self.amount - self.index) / self.index)
-        self.progress_label.setText(f"{self.index}/{self.amount}\t Time Elapsed: {time_elapsed}\t "
-                                    f"Time Remaining: {time_remaining}")
+        self.progress_label.setText(localizator.get("progress_label").format(
+            self.index, self.amount, time_elapsed, time_remaining))
 
 

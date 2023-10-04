@@ -1,5 +1,5 @@
 from configparser import ConfigParser
-from typing import Union, Generator, List
+from typing import Union, Generator, List, Dict
 from time import sleep
 
 from lantz.core import Feat
@@ -12,6 +12,12 @@ class PointSelectBackend(ConfigurableInstrument):
     """
     This class exists only to utilize the connect_feat function from Lantz.
     """
+
+    def variable_documentation(self) -> Dict[str, str]:
+        return {
+            "x": "The X coordinate of the motor. It's a virtual variable.",
+            "y": "The Y coordinate of the motor. It's a virtual variable.",
+        }
 
     def configure(self, x, y):
         sleep(0.1)
