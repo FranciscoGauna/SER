@@ -46,6 +46,14 @@ class ExperimentRunner(LogMixin):
     def run_experiment(self, iteration_callback: Callable = None):
         self.log_info("Starting Experiment")
 
+        # TODO: mencionar este funcionamiento en la documentacion
+        # We initialize every component
+        for conf in self.conf_comp:
+            conf.component.instrument.initialize()
+        for observe in self.observe_comp:
+            observe.component.instrument.initialize()
+
+        # Main experimental loop
         while not self.stopped and self.arg_tracker.advance():
             self.data.next()
             config_time_start = datetime.now()
@@ -65,6 +73,12 @@ class ExperimentRunner(LogMixin):
             if iteration_callback:
                 iteration_callback()
             self.log_debug("Advanced one iteration")
+
+        # We finalize every component
+        for conf in self.conf_comp:
+            conf.component.instrument.finalize()
+        for observe in self.observe_comp:
+            observe.component.instrument.finalize()
 
         self.stopped = True
 
