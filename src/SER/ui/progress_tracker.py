@@ -30,12 +30,13 @@ class ProgressTracker(LogMixin):
         self.start_time = datetime.now()
         self.progress_label.setText(f"0/{self.amount}")  # No Locale because it's only numeric
 
-    def advance(self):
-        self.index += 1
-        self.progress_bar.setValue(self.index)
-        time_elapsed = datetime.now() - self.start_time
-        time_remaining = time_elapsed * ((self.amount - self.index) / self.index)
-        self.progress_label.setText(localizator.get("progress_label").format(
-            self.index, self.amount, time_elapsed, time_remaining))
+    def advance(self, amount):
+        self.index += amount
+        if self.index > 0:
+            self.progress_bar.setValue(self.index)
+            time_elapsed = datetime.now() - self.start_time
+            time_remaining = time_elapsed * ((self.amount - self.index) / self.index)
+            self.progress_label.setText(localizator.get("progress_label").format(
+                self.index, self.amount, time_elapsed, time_remaining))
 
 

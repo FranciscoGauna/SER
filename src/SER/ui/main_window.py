@@ -130,10 +130,10 @@ class MainWidget(QStackedWidget, LogMixin):
 
         # Text
         self.data_box.setTitle(localizator.get("data"))
-        self.data_save_csv_button.setMask(localizator.get("Save as csv"))
-        self.data_save_mat_button.setMask(localizator.get("Save as MAT"))
-        self.data_save_docs_mkd_button.setMask(localizator.get("Save docs as Markdown"))
-        self.data_save_docs_htm_button.setMask(localizator.get("Save docs as HTML"))
+        self.data_save_csv_button.setText(localizator.get("Save as csv"))
+        self.data_save_mat_button.setText(localizator.get("Save as MAT"))
+        self.data_save_docs_mkd_button.setText(localizator.get("Save docs as Markdown"))
+        self.data_save_docs_htm_button.setText(localizator.get("Save docs as HTML"))
 
     def start_experiment(self):
         """
@@ -179,7 +179,7 @@ class MainWidget(QStackedWidget, LogMixin):
         self.progress_lock.release()
 
         # Now that we have thread safe data, we update the run_ui which the data since the last iteration
-        self.progress_tracker.advance()
+        self.progress_tracker.advance(len(delta_list))
         for run_ui in self.run_data_ui:
             run_ui.add_data(delta_list)
 
