@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from configparser import ConfigParser
 from typing import Tuple, Dict, Any, Generator
 
 from lantz.core.log import get_logger
@@ -14,12 +13,12 @@ class Instrument(Backend):
         self.logger = get_logger(self.logger_name)
 
     @abstractmethod
-    def get_config(self) -> ConfigParser:
-        raise NotImplementedError("The method observe has not been implemented")
+    def get_config(self) -> Dict:
+        raise NotImplementedError("The method get_config has not been implemented")
 
     @abstractmethod
-    def set_config(self, config: ConfigParser):
-        raise NotImplementedError("The method observe has not been implemented")
+    def set_config(self, config: Dict):
+        raise NotImplementedError("The method set_config has not been implemented")
 
     @abstractmethod
     def variable_documentation(self) -> Dict[str, str]:

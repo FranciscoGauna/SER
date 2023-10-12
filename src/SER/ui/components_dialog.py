@@ -1,6 +1,6 @@
+import json
 from os import path
 from typing import Collection, List
-from configparser import ConfigParser
 
 from PyQt5 import uic
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QDialog, QLabel, QPushButton, QFileDialog, QDialogButtonBox
@@ -39,29 +39,30 @@ class ComponentConfigWidget(QWidget):
         file_dialog = QFileDialog()
         file_dialog.setDirectory(self.folder)
         file_name, _ = file_dialog.getOpenFileName(self, "Open File", "",
-                                                   "Configuration File (*.ini);;All Files (*)", options=options)
+                                                   "JavaScript Object Notation (*.json);;All Files (*)", options=options)
 
         if file_name:
-            config = ConfigParser()
-            config.read(file_name)
-            self.component.component.instrument.set_config(config)
+            with open(file_name, "r+") as file:
+                self.component.component.instrument.set_config(json.load(file))
 
     def save_configuration(self):
         options = QFileDialog.Options()
         file_dialog = QFileDialog()
         file_dialog.setDirectory(self.folder)
         file_name, _ = file_dialog.getSaveFileName(self, "Save File", "",
-                                                   "Configuration File (*.ini);;All Files (*)", options=options)
+                                                   "JavaScript Object Notation (*.json);;All Files (*)", options=options)
 
         if file_name:
             config = self.component.component.instrument.get_config()
             with open(file_name, "w+") as file:
-                config.write(file)
+                json.dump(config, file)
 
 
 class ComponentsDialog(QDialog):
     components_layout: QVBoxLayout
-    components_widgets: List[ComponentConfigWidget]
+    components_widgets: dict[str, ComponentConfigWidget]
+    load_all_button: QPushButton
+    save_all_button: QPushButton
     button_box: QDialogButtonBox
 
     def __init__(self, components: Collection[ComponentInitialization], folder="."):
@@ -73,7 +74,43 @@ class ComponentsDialog(QDialog):
         ui_file_path = path.join(path.dirname(path.realpath(__file__)), "components_dialog.ui")
         uic.loadUi(ui_file_path, self)
 
-        self.components_widgets = []
+        self.folder = folder
+
+        self.components_widgets = {}
         for component in components:
-            self.components_widgets.append(ComponentConfigWidget(component))
-            self.components_layout.addWidget(self.components_widgets[-1])
+            self.components_widgets[component.name] = ComponentConfigWidget(component, folder)
+            self.components_layout.addWidget(self.components_widgets[component.name])
+
+        self.load_all_button.pressed.connect(self.load_all_configuration)
+        self.save_all_button.pressed.connect(self.save_all_configuration)
+
+        # Text
+        self.load_all_button.setText(localizator.get("load_all_configuration"))
+        self.save_all_button.setText(localizator.get("save_all_configuration"))
+
+    def load_all_configuration(self):
+        options = QFileDialog.Options()
+        file_dialog = QFileDialog()
+        file_dialog.setDirectory(self.folder)
+        file_name, _ = file_dialog.getOpenFileName(self, "Open File", "",
+                                                   "JavaScript Object Notation (*.json);;All Files (*)", options=options)
+
+        if file_name:
+            with open(file_name, "r+") as file:
+                configs = json.load(file)
+                for name, comp_w in configs.items():
+                    self.components_widgets[name].component.component.instrument.set_config(comp_w)
+
+    def save_all_configuration(self):
+        options = QFileDialog.Options()
+        file_dialog = QFileDialog()
+        file_dialog.setDirectory(self.folder)
+        file_name, _ = file_dialog.getSaveFileName(self, "Save File", "",
+                                                   "JavaScript Object Notation (*.json);;All Files (*)", options=options)
+
+        if file_name:
+            with open(file_name, "w+") as file:
+                combined_configs = {}
+                for name, comp_w in self.components_widgets.items():
+                    combined_configs[name] = comp_w.component.component.instrument.get_config()
+                json.dump(combined_configs, file)

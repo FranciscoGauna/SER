@@ -1,4 +1,4 @@
-from configparser import ConfigParser
+import json
 from os import path
 
 from PyQt5.QtWidgets import QApplication
@@ -12,10 +12,10 @@ from src.SER.interfaces import ComponentInitialization
 
 app = QApplication([])
 motor_1 = VirtualPlatina()
-if path.exists("motor_1.ini"):
-    config = ConfigParser()
-    config.read("motor_1.ini")
-    motor_1.instrument.set_config(config)
+if path.exists("motor_1.json"):
+    with open("motor_1.json", "r+") as file:
+        config = json.load(file)
+        motor_1.instrument.set_config(config)
 mapper = TwoDMapper(motor_1.conf_ui.x_amount, motor_1.conf_ui.y_amount, 0, 0, "motor 1",
                     ("RandValue", "val"))
 launch_app(
@@ -28,5 +28,5 @@ launch_app(
     [mapper],
     [mapper]
 )
-with open("motor_1.ini", "w+") as file:
-    motor_1.instrument.get_config().write(file)
+with open("motor_1.json", "w+") as file:
+    json.dump(motor_1.instrument.get_config(), file)

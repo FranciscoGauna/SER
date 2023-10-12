@@ -1,4 +1,3 @@
-from configparser import ConfigParser
 from typing import Union, Generator, List, Dict
 from time import sleep
 
@@ -92,21 +91,19 @@ class PointSelectBackend(ConfigurableInstrument):
     def point_amount(self) -> int:
         return self._x_amount * self._y_amount
 
-    def get_config(self) -> ConfigParser:
-        config = ConfigParser()
-        config["X"] = {
+    def get_config(self) -> {}:
+        config = {"X": {
             "amount": str(self._x_amount),
             "init": str(self._x_init),
             "final": str(self._x_final),
-        }
-        config["Y"] = {
+        }, "Y": {
             "amount": str(self._y_amount),
             "init": str(self._y_init),
             "final": str(self._y_final),
-        }
+        }}
         return config
 
-    def set_config(self, config: ConfigParser):
+    def set_config(self, config: Dict):
         self.x_amount = int(config["X"]["amount"])
         self.x_init = float(config["X"]["init"])
         self.x_final = float(config["X"]["final"])

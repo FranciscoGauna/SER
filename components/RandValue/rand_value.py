@@ -1,6 +1,5 @@
-from configparser import ConfigParser
 from random import random
-from typing import Union, Generator, List, Dict, Any
+from typing import Generator, Dict, Any
 
 from lantz.core import Feat
 
@@ -12,13 +11,11 @@ class RandValInstrument(ObservableInstrument):
     def variable_documentation(self) -> Dict[str, str]:
         return {"val": f"This represents a random value in the {self.min}-{self.max} range"}
 
-    def get_config(self) -> ConfigParser:
-        config = ConfigParser()
-        config["min"] = self.min
-        config["max"] = self.max
+    def get_config(self):
+        config = {"min": self.min, "max": self.max}
         return config
 
-    def set_config(self, config: ConfigParser):
+    def set_config(self, config: Dict):
         self.min = float(config["min"])
         self.max = float(config["max"])
 
