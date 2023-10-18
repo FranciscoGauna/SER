@@ -91,12 +91,11 @@ class MainWidget(QStackedWidget, LogMixin):
 
     def load_config_gui(self, conf_folder):
         self.log_debug(msg="Started loading configuration interface")
-        max_x = 0
-        max_y = 0
+
         for component in self.components:
-            self.conf_layout.addWidget(component.component.conf_ui, component.y, component.x)
-            max_x = max(max_x, component.x)
-            max_y = max(max_y, component.y)
+            if component.component.conf_ui is not None:
+                self.conf_layout.addWidget(component.component.conf_ui, component.y, component.x)
+
         self.start_button.pressed.connect(self.start_experiment)
         self.setCurrentWidget(self.conf_page)
         self.configuration_dialog = ComponentsDialog(self.components, conf_folder)
@@ -111,8 +110,13 @@ class MainWidget(QStackedWidget, LogMixin):
         self.log_debug(msg="Started loading run interface")
         self.progress_tracker = ProgressTracker(self.progress_bar, self.progress_label)
         self.run_stop_button.pressed.connect(self.stop_experiment)
+
         for ui in self.run_data_ui:
             self.run_layout.addWidget(ui, ui.x, ui.y)
+
+        for component in self.components:
+            if component.component.conf_ui is not None:
+                self.conf_layout.addWidget(component.component.conf_ui, component.y, component.x)
 
         # Text
         self.run_box.setTitle(localizator.get("running"))

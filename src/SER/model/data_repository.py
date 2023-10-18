@@ -50,5 +50,9 @@ class DataRepository(LogMixin):
         df = self.to_dataframe()
         mat_dict = {}
         for column in df.columns:
+            column: str
+            column = column.replace(" ", "_")
+            if column in mat_dict:
+                self.log_error("Matlab column name collision!")
             mat_dict[column] = df[column].to_numpy(copy=True)
         savemat(filename, mat_dict)
