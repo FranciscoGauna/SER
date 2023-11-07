@@ -15,17 +15,19 @@ from .localization import localizator
 from .progress_tracker import ProgressTracker
 from ..interfaces import ComponentInitialization, ProcessDataUI, FinalDataUI
 from ..model.documentation import to_md, to_htm
-from ..model.runner import ExperimentRunner
+from ..model.sequencer import ExperimentSequencer
 
 
 class MainWidget(QStackedWidget, LogMixin):
     progress_ended = pyqtSignal()
+    run_started = pyqtSignal()
 
     conf_layout: QGridLayout
     run_layout: QGridLayout
     data_layout: QGridLayout
 
     start_button: QPushButton
+    add_run_button: QPushButton
     load_conf_button: QPushButton
     configuration_dialog: ComponentsDialog
 
@@ -55,7 +57,8 @@ class MainWidget(QStackedWidget, LogMixin):
     data_box: QGroupBox
 
     def __init__(self, components: Collection[ComponentInitialization], run_data_ui: Collection[ProcessDataUI],
-                 final_data_ui: Collection[FinalDataUI], runner: ExperimentRunner, conf_folder=".", out_folder="."):
+                 final_data_ui: Collection[FinalDataUI], sequencer: ExperimentSequencer, conf_folder=".",
+                 out_folder="."):
         super().__init__()
 
         # This loads the file and loads up each object as part of this class
@@ -64,9 +67,9 @@ class MainWidget(QStackedWidget, LogMixin):
         ui_file_path = path.join(path.dirname(path.realpath(__file__)), "main_widget.ui")
         uic.loadUi(ui_file_path, self)
 
-        # Creating Runner
+        # Creating Sequencer
         self.components = components
-        self.runner = runner
+        self.sequencer = sequencer
         self.run_thread = Thread(target=self.run_experiment)
         self.started = False
         self.logger = get_logger("SER.Core.MainWindow")
@@ -78,6 +81,7 @@ class MainWidget(QStackedWidget, LogMixin):
 
         # Storing and loading UI only components
         self.run_data_ui = run_data_ui
+        self.timer_started = False
         self.final_data_ui = final_data_ui
 
         self.load_config_gui(conf_folder)
@@ -86,6 +90,7 @@ class MainWidget(QStackedWidget, LogMixin):
 
         # Connecting Slots
         self.progress_ended.connect(self.progress_end)
+        self.run_started.connect(self.sequence_change)
 
         self.show()
 
@@ -97,12 +102,14 @@ class MainWidget(QStackedWidget, LogMixin):
                 self.conf_layout.addWidget(component.component.conf_ui, component.y, component.x)
 
         self.start_button.pressed.connect(self.start_experiment)
+        self.add_run_button.pressed.connect(self.add_run)
         self.setCurrentWidget(self.conf_page)
         self.configuration_dialog = ComponentsDialog(self.components, conf_folder)
         self.load_conf_button.pressed.connect(self.configuration_dialog.show)
 
         # Text
         self.load_conf_button.setText(localizator.get("load_configuration"))
+        self.add_run_button.setText(localizator.get("add_run_configuration"))
         self.start_button.setText(localizator.get("start_experiment"))
         self.conf_box.setTitle(localizator.get("configuration"))
 
@@ -139,6 +146,9 @@ class MainWidget(QStackedWidget, LogMixin):
         self.data_save_docs_mkd_button.setText(localizator.get("Save docs as Markdown"))
         self.data_save_docs_htm_button.setText(localizator.get("Save docs as HTML"))
 
+    def add_run(self):
+        self.sequencer.add_run()
+
     def start_experiment(self):
         """
         This method runs strictly after the configuration, so it cleans the gui of those widgets
@@ -153,26 +163,37 @@ class MainWidget(QStackedWidget, LogMixin):
 
     def run_experiment(self):
         self.log_debug(msg="Changing interface to the data interface")
-        self.runner.run_experiment(self.progress_change)
+        self.sequencer.start_sequence(self.sequence_change_sync, self.progress_change)
         self.progress_ended.emit()
 
     def stop_experiment(self):
         self.log_info(msg="Stopping the experiment prematurely with the button")
-        self.runner.stopped = True  # Assignment is atomic
+        self.sequencer.stop()
 
     # TODO: Considerar mover esto a una clase propia
     def progress_start(self):
         self.progress_list = []
         self.progress_lock = Lock()
-        QTimer().singleShot(50, self.progress_update)
-        self.progress_tracker.start(self.runner.arg_tracker.points_amount())
+
+    def sequence_change_sync(self):
+        self.progress_lock.acquire()
+        self.progress_list = []
+        self.progress_lock.release()
+        self.run_started.emit()
+
+    @pyqtSlot()
+    def sequence_change(self):
+        self.progress_tracker.start(self.sequencer.runner.arg_tracker.points_amount())
         for run_ui in self.run_data_ui:
             run_ui.initialize()
+        if not self.timer_started:
+            QTimer().singleShot(50, self.progress_update)
+            self.timer_started = True
 
     def progress_change(self):
         # The lock ensures that we never add data to a list in the middle of being passed to another
         self.progress_lock.acquire()
-        self.progress_list.append(self.runner.data.data[-1])
+        self.progress_list.append(self.sequencer.data.last_datum())
         self.progress_lock.release()
 
     def progress_update(self):
@@ -183,22 +204,24 @@ class MainWidget(QStackedWidget, LogMixin):
         self.progress_lock.release()
 
         # Now that we have thread safe data, we update the run_ui which the data since the last iteration
+        total_amount = 1
         self.progress_tracker.advance(len(delta_list))
         for run_ui in self.run_data_ui:
             run_ui.add_data(delta_list)
 
-        if not self.runner.stopped:
+        if not self.sequencer.stopped:
             QTimer().singleShot(50, self.progress_update)
         elif len(self.progress_list) > 0:
             QTimer().singleShot(50, self.progress_update)
 
     @pyqtSlot()
     def progress_end(self):
-        self.data_model = TableModel(self.runner.data.to_dataframe())
+        self.data_model = TableModel(self.sequencer.data.to_dataframe())
         self.data_table.setModel(self.data_model)
         self.load_data_gui()
         self.setCurrentWidget(self.data_page)
 
+    # Export Data
     def export_to_csv(self):
         options = QFileDialog.Options()
         file_dialog = QFileDialog()
@@ -207,7 +230,7 @@ class MainWidget(QStackedWidget, LogMixin):
                                                    "Comma-separated values (*.csv);;All Files (*)", options=options)
 
         if file_name:
-            self.runner.data.to_csv(file_name)
+            self.sequencer.data.to_csv(file_name)
 
     def export_to_matlab(self):
         options = QFileDialog.Options()
@@ -217,7 +240,7 @@ class MainWidget(QStackedWidget, LogMixin):
                                                    "MAT-file (*.MAT);;All Files (*)", options=options)
 
         if file_name:
-            self.runner.data.to_matlab(file_name)
+            self.sequencer.data.to_matlab(file_name)
 
     def export_docs_to_htm(self):
         options = QFileDialog.Options()

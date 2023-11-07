@@ -23,9 +23,9 @@ class ProgressTracker(LogMixin):
         self.amount = 0
         self.index = 0
 
-    def start(self, amount: int):
+    def start(self, amount):
         self.amount = amount
-        self.progress_bar.setRange(0, amount)
+        self.progress_bar.setRange(0, self.amount)
         self.progress_bar.setValue(0)
         self.start_time = datetime.now()
         self.progress_label.setText(f"0/{self.amount}")  # No Locale because it's only numeric

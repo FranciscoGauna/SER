@@ -3,7 +3,7 @@ from typing import Collection
 
 from PyQt5.QtWidgets import QApplication
 
-from .model.runner import ExperimentRunner
+from .model.sequencer import ExperimentSequencer
 from .ui.main_window import MainWidget
 from .interfaces import ComponentInitialization, ProcessDataUI, FinalDataUI
 from .log import log_to_socket, LOGGER, log_to_screen
@@ -22,7 +22,7 @@ def launch_app(
     LOGGER.log(logging.DEBUG, "Starting Framework")
 
     # The main interface that has the code to start the experiment
-    runner = ExperimentRunner(configurable_components, observable_components)
+    sequencer = ExperimentSequencer(configurable_components, observable_components)
     window = MainWidget([*configurable_components, *observable_components],
-                        run_data_ui, final_data_ui, runner)
+                        run_data_ui, final_data_ui, sequencer)
     app.exec()

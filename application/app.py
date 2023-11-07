@@ -2,6 +2,7 @@ import json
 from os import path
 
 from PyQt5.QtWidgets import QApplication
+from lantz.core.log import log_to_screen
 
 from components.TwoDMapper import TwoDMapper
 from components.VirtualPlatina import VirtualPlatina
@@ -18,6 +19,8 @@ if path.exists("motor_1.json"):
         motor_1.instrument.set_config(config)
 mapper = TwoDMapper(motor_1.conf_ui.x_amount, motor_1.conf_ui.y_amount, 0, 0, "motor 1",
                     ("RandValue", "val"))
+
+log_to_screen()
 launch_app(
     app, [
         ComponentInitialization(motor_1, 0, 0, 0, "motor 1"),

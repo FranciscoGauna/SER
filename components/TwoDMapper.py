@@ -35,6 +35,8 @@ class TwoDMapper(ProcessDataUI):
         self.data = [[None for _ in range(self.width)] for _ in range(self.height)]
         self.canvas = PlotCanvas(self.data)
         self.setCentralWidget(self.canvas)
+        self.x_counter = 0
+        self.y_counter = 0
 
     def add_data(self, data: List[Dict[str, Dict[str, Any]]]):
         for datum in data:

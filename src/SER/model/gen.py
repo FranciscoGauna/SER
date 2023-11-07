@@ -9,7 +9,8 @@ class MultipleArgTracker:
         ]
     ]
 
-    def __init__(self, generators: List[Callable[[], Generator]], functions: List[Callable], next_tracker: Callable, parent):
+    def __init__(self, generators: List[Callable[[], Generator]], functions: List[Callable], next_tracker: Callable,
+                 parent):
         self.functions = functions
         self.gen_fun = generators
         assert len(generators) == len(functions)
@@ -24,18 +25,18 @@ class MultipleArgTracker:
 
     def advance(self):
         try:
-            for g, f in self.generators:
-                arg = next(g)
-                f(*arg)
+            for generator, function in self.generators:
+                arg = next(generator)
+                function(*arg)
         except StopIteration:
             self.next()
             # The 'last' MultipleArgTracker is connected to the parent calling it to stop
             if self.parent.stopped:
                 return
             self.reset_generators()
-            for g, f in self.generators:
-                arg = next(g)
-                f(*arg)
+            for generator, function in self.generators:
+                arg = next(generator)
+                function(*arg)
 
     def amount(self) -> int:
         return len(list(self.gen_fun[0]()))

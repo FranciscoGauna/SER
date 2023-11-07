@@ -15,15 +15,23 @@ class ExperimentRunner(LogMixin):
     def __init__(
             self,
             configurable_components: Collection[ComponentInitialization],
-            observable_components: Collection[ComponentInitialization]
+            observable_components: Collection[ComponentInitialization],
+            data: DataRepository
     ):
         self.logger = get_logger("SER.Core.ExperimentRunner")
         self.observe_comp = observable_components
         self.conf_comp = configurable_components
-        self.data = DataRepository()
+        self.data = data
 
         # We create an instance of the dispatcher:
         self.dispatcher = Dispatcher()
+
+    def wrap_fun(self, name, fun):
+        wrapped_fun = lambda *args: self.data.add_datum(name, fun(*args))
+        return self.dispatcher.wrap(wrapped_fun)
+
+    def run_experiment(self, iteration_callback: Callable = None):
+        self.log_info("Starting Experiment Run")
 
         # We create the meta arg tracker
         # To do so we need a structure of each generator with the corresponding functions
@@ -33,25 +41,11 @@ class ExperimentRunner(LogMixin):
                 comp.component.instrument.get_points,
                 self.wrap_fun(comp.name, comp.component.instrument.configure)
             )
-            for comp in configurable_components
+            for comp in self.conf_comp
         ]
 
         self.arg_tracker = MetaArgTracker(generators)
         self.stopped = False
-
-    def wrap_fun(self, name, fun):
-        wrapped_fun = lambda *args: self.data.add_datum(name, fun(*args))
-        return self.dispatcher.wrap(wrapped_fun)
-
-    def run_experiment(self, iteration_callback: Callable = None):
-        self.log_info("Starting Experiment")
-
-        # TODO: mencionar este funcionamiento en la documentacion
-        # We initialize every component
-        for conf in self.conf_comp:
-            conf.component.instrument.initialize()
-        for observe in self.observe_comp:
-            observe.component.instrument.initialize()
 
         # Main experimental loop
         while not self.stopped and self.arg_tracker.advance():
@@ -74,15 +68,9 @@ class ExperimentRunner(LogMixin):
                 iteration_callback()
             self.log_debug("Advanced one iteration")
 
-        # We finalize every component
-        for conf in self.conf_comp:
-            conf.component.instrument.finalize()
-        for observe in self.observe_comp:
-            observe.component.instrument.finalize()
-
         self.stopped = True
 
-        self.log_info("Ending Experiment")
+        self.log_info("Ending Experiment Run")
 
     def point_amount(self) -> int:
         return self.arg_tracker.points_amount()

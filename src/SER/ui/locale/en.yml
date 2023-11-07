@@ -1,6 +1,7 @@
 # Conf
 load_configuration: "Load Configuration"
 save_configuration: "Save Configuration"
+add_run_configuration: "Add Run Configuration"
 load_all_configuration: "Load All Configurations"
 save_all_configuration: "Save All Configurations"
 start_experiment: "Start Experiment"

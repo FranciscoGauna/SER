@@ -7,16 +7,25 @@ import pandas as pd
 
 
 class DataRepository(LogMixin):
+    run_number: int
 
     def __init__(self):
         self.logger = get_logger("SER.Core.Dispatcher")
         self.data: List[Dict[str, Dict[str, Any]]] = []
+        self.run_number = 0
 
     def next(self):
-        self.data.append({})
+        # TODO: document this name
+        self.data.append({"run": {"id": self.run_number}})
+
+    def next_run(self):
+        self.run_number += 1
 
     def add_datum(self, name: str, datum: Dict[str, Any]):
         self.data[-1][name] = datum
+
+    def last_datum(self):
+        return self.data[-1]
 
     def get_datum_index(self, index):
         return self.data[index]

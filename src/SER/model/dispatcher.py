@@ -9,7 +9,7 @@ from pimpmyclass.mixins import LogMixin
 counter = 0
 
 
-def execute_fun(task: tuple[callable, Any, ...]):
+def execute_fun(task: tuple[callable, tuple]):
     # TODO: documentar esta linea
     if environ.get("ENABLE_PROFILING"):
         global counter
@@ -21,7 +21,7 @@ def execute_fun(task: tuple[callable, Any, ...]):
 
 
 class Dispatcher(LogMixin):
-    tasks: List[Tuple[Callable, Any]]
+    tasks: List[Tuple[Callable, Tuple]]
 
     def __init__(self):
         self.logger = get_logger("SER.Core.Dispatcher")
