@@ -63,7 +63,6 @@ class ExperimentSequencer(LogMixin):
             if self.stopped:
                 break
 
-
         self.stopped = True
 
         # We finalize every component

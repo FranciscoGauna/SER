@@ -11,6 +11,7 @@ from .gen import MetaArgTracker
 
 
 class ExperimentRunner(LogMixin):
+    arg_tracker: MetaArgTracker
 
     def __init__(
             self,
@@ -29,6 +30,13 @@ class ExperimentRunner(LogMixin):
     def wrap_fun(self, name, fun):
         wrapped_fun = lambda *args: self.data.add_datum(name, fun(*args))
         return self.dispatcher.wrap(wrapped_fun)
+
+    def point_amount(self):
+        # This means we don't have currently a point amount (and also no arg_tracker)
+        if self.stopped:
+            return 1
+
+        return self.arg_tracker.points_amount()
 
     def run_experiment(self, point_callback: Callable = None):
         self.log_info("Starting Experiment Run")

@@ -12,6 +12,7 @@ from pimpmyclass.mixins import LogMixin
 from .components_dialog import ComponentsDialog
 from .data_table import TableModel
 from .localization import localizator
+from .process_ui_manager import ProcessUIManager
 from .progress_tracker import ProgressTracker
 from ..interfaces import ComponentInitialization, ProcessDataUI, FinalDataUI
 from ..model.documentation import to_md, to_htm
@@ -20,7 +21,6 @@ from ..model.sequencer import ExperimentSequencer
 
 class MainWidget(QStackedWidget, LogMixin):
     sequence_ended = pyqtSignal()
-    run_started = pyqtSignal()
 
     conf_layout: QGridLayout
     run_layout: QGridLayout
@@ -32,13 +32,9 @@ class MainWidget(QStackedWidget, LogMixin):
     configuration_dialog: ComponentsDialog
 
     run_stop_button: QPushButton
-    progress_tracker: ProgressTracker
+    progress_manager: ProcessUIManager
     progress_bar: QProgressBar
     progress_label: QLabel
-
-    progress_timer: QTimer
-    progress_list: list  # This stores the value of each datum that has been added since the last iteration
-    progress_lock: Lock
 
     data_save_docs_htm_button: QPushButton
     data_save_docs_mkd_button: QPushButton
@@ -88,9 +84,7 @@ class MainWidget(QStackedWidget, LogMixin):
         self.load_run_gui()
         self.out_folder = out_folder
 
-        # Connecting Slots
         self.sequence_ended.connect(self.sequence_end)
-        self.run_started.connect(self.run_start)
 
         self.show()
 
@@ -115,7 +109,9 @@ class MainWidget(QStackedWidget, LogMixin):
 
     def load_run_gui(self):
         self.log_debug(msg="Started loading run interface")
-        self.progress_tracker = ProgressTracker(self.progress_bar, self.progress_label)
+        progress_tracker = ProgressTracker(self.progress_bar, self.progress_label,
+                                                self.sequencer.runner.point_amount)
+        self.progress_manager = ProcessUIManager(self.run_data_ui, progress_tracker, self.sequencer.data)
         self.run_stop_button.pressed.connect(self.stop_experiment)
 
         for ui in self.run_data_ui:
@@ -141,10 +137,10 @@ class MainWidget(QStackedWidget, LogMixin):
 
         # Text
         self.data_box.setTitle(localizator.get("data"))
-        self.data_save_csv_button.setText(localizator.get("Save as csv"))
-        self.data_save_mat_button.setText(localizator.get("Save as MAT"))
-        self.data_save_docs_mkd_button.setText(localizator.get("Save docs as Markdown"))
-        self.data_save_docs_htm_button.setText(localizator.get("Save docs as HTML"))
+        self.data_save_csv_button.setText(localizator.get("save_as_csv"))
+        self.data_save_mat_button.setText(localizator.get("save_as_mat"))
+        self.data_save_docs_mkd_button.setText(localizator.get("save_as_md"))
+        self.data_save_docs_htm_button.setText(localizator.get("save_as_html"))
 
     def add_run(self):
         self.sequencer.add_run()
@@ -158,64 +154,22 @@ class MainWidget(QStackedWidget, LogMixin):
             self.started = True
             self.log_debug(msg="Changing interface to the experiment interface")
             self.setCurrentWidget(self.run_page)
-            self.progress_start()
             self.run_thread.start()
 
     def run_experiment(self):
         self.log_debug(msg="Changing interface to the data interface")
-        self.sequencer.start_sequence(self.sequence_change_sync, self.progress_change)
+        self.sequencer.start_sequence(self.progress_manager.run_started.emit,
+                                      self.progress_manager.point_add)
         self.sequence_ended.emit()
 
     def stop_experiment(self):
         self.log_info(msg="Stopping the experiment prematurely with the button")
         self.sequencer.stop()
-
-    # TODO: Considerar mover esto a una clase propia
-    def progress_start(self):
-        self.progress_list = []
-        self.progress_lock = Lock()
-
-    def sequence_change_sync(self):
-        self.progress_lock.acquire()
-        self.progress_list = []
-        self.progress_lock.release()
-        self.run_started.emit()
-
-    @pyqtSlot()
-    def run_start(self):
-        self.progress_tracker.start(self.sequencer.runner.arg_tracker.points_amount())
-        for run_ui in self.run_data_ui:
-            run_ui.initialize()
-        if not self.timer_started:
-            QTimer().singleShot(50, self.progress_update)
-            self.timer_started = True
-
-    def progress_change(self):
-        # The lock ensures that we never add data to a list in the middle of being passed to another
-        self.progress_lock.acquire()
-        self.progress_list.append(self.sequencer.data.last_datum())
-        self.progress_lock.release()
-
-    def progress_update(self):
-        # Assignment operations are atomic, but we want to ensure that delta list isn't modified during the update
-        self.progress_lock.acquire()
-        delta_list = self.progress_list
-        self.progress_list = []
-        self.progress_lock.release()
-
-        # Now that we have thread safe data, we update the run_ui which the data since the last iteration
-        total_amount = 1
-        self.progress_tracker.advance(len(delta_list))
-        for run_ui in self.run_data_ui:
-            run_ui.add_data(delta_list)
-
-        if not self.sequencer.stopped:
-            QTimer().singleShot(50, self.progress_update)
-        elif len(self.progress_list) > 0:
-            QTimer().singleShot(50, self.progress_update)
+        self.progress_manager.stop()
 
     @pyqtSlot()
     def sequence_end(self):
+        self.progress_manager.stop()
         self.data_model = TableModel(self.sequencer.data.to_dataframe())
         self.data_table.setModel(self.data_model)
         self.load_data_gui()
