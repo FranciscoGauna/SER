@@ -19,7 +19,7 @@ from ..model.sequencer import ExperimentSequencer
 
 
 class MainWidget(QStackedWidget, LogMixin):
-    progress_ended = pyqtSignal()
+    sequence_ended = pyqtSignal()
     run_started = pyqtSignal()
 
     conf_layout: QGridLayout
@@ -89,8 +89,8 @@ class MainWidget(QStackedWidget, LogMixin):
         self.out_folder = out_folder
 
         # Connecting Slots
-        self.progress_ended.connect(self.progress_end)
-        self.run_started.connect(self.sequence_change)
+        self.sequence_ended.connect(self.sequence_end)
+        self.run_started.connect(self.run_start)
 
         self.show()
 
@@ -164,7 +164,7 @@ class MainWidget(QStackedWidget, LogMixin):
     def run_experiment(self):
         self.log_debug(msg="Changing interface to the data interface")
         self.sequencer.start_sequence(self.sequence_change_sync, self.progress_change)
-        self.progress_ended.emit()
+        self.sequence_ended.emit()
 
     def stop_experiment(self):
         self.log_info(msg="Stopping the experiment prematurely with the button")
@@ -182,7 +182,7 @@ class MainWidget(QStackedWidget, LogMixin):
         self.run_started.emit()
 
     @pyqtSlot()
-    def sequence_change(self):
+    def run_start(self):
         self.progress_tracker.start(self.sequencer.runner.arg_tracker.points_amount())
         for run_ui in self.run_data_ui:
             run_ui.initialize()
@@ -215,7 +215,7 @@ class MainWidget(QStackedWidget, LogMixin):
             QTimer().singleShot(50, self.progress_update)
 
     @pyqtSlot()
-    def progress_end(self):
+    def sequence_end(self):
         self.data_model = TableModel(self.sequencer.data.to_dataframe())
         self.data_table.setModel(self.data_model)
         self.load_data_gui()

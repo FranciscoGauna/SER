@@ -43,7 +43,7 @@ class ExperimentSequencer(LogMixin):
         self.sequence.append(new_run)
         self.log_info(f"Added new run: {new_run}")
 
-    def start_sequence(self, sequence_callback: Callable, iteration_callback: Callable):
+    def start_sequence(self, run_callback: Callable, point_callback: Callable):
         # TODO: mention the initialize in documentation
         # We initialize every component
         for conf in self.runner.conf_comp:
@@ -56,9 +56,9 @@ class ExperimentSequencer(LogMixin):
         for run in self.sequence:
             for comp, conf in run.items():
                 self.components[comp].set_config(conf)
-            if sequence_callback:
-                sequence_callback()
-            self.runner.run_experiment(iteration_callback)
+            if run_callback:
+                run_callback()
+            self.runner.run_experiment(point_callback)
             self.data.next_run()
             if self.stopped:
                 break

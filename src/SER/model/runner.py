@@ -30,7 +30,7 @@ class ExperimentRunner(LogMixin):
         wrapped_fun = lambda *args: self.data.add_datum(name, fun(*args))
         return self.dispatcher.wrap(wrapped_fun)
 
-    def run_experiment(self, iteration_callback: Callable = None):
+    def run_experiment(self, point_callback: Callable = None):
         self.log_info("Starting Experiment Run")
 
         # We create the meta arg tracker
@@ -64,8 +64,8 @@ class ExperimentRunner(LogMixin):
                 "end_time": datetime.now()
             })
 
-            if iteration_callback:
-                iteration_callback()
+            if point_callback:
+                point_callback()
             self.log_debug("Advanced one iteration")
 
         self.stopped = True
