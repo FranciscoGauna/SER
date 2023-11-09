@@ -43,6 +43,9 @@ class ExperimentSequencer(LogMixin):
         self.sequence.append(new_run)
         self.log_info(f"Added new run: {new_run}")
 
+    def load_sequence(self, sequence):
+        self.sequence = sequence
+
     def start_sequence(self, run_callback: Callable[[], Any], point_callback: Callable):
         # TODO: mention the initialize in documentation
         # We initialize every component

@@ -132,7 +132,7 @@ class ComponentsDialog(QDialog):
 
         if file_name:
             with open(file_name, "r+") as file:
-                self.sequencer.sequence = json.load(file)
+                self.sequencer.load_sequence(json.load(file))
 
     def save_sequence(self):
         options = QFileDialog.Options()
