@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QDialog, QLabel, QPushButton, 
 
 from .localization import localizator
 from ..interfaces import ComponentInitialization
+from ..model.sequencer import ExperimentSequencer
 
 
 class ComponentConfigWidget(QWidget):
@@ -61,11 +62,13 @@ class ComponentConfigWidget(QWidget):
 class ComponentsDialog(QDialog):
     components_layout: QVBoxLayout
     components_widgets: dict[str, ComponentConfigWidget]
-    load_all_button: QPushButton
-    save_all_button: QPushButton
+    load_run_button: QPushButton
+    save_run_button: QPushButton
+    load_sequence_button: QPushButton
+    save_sequence_button: QPushButton
     button_box: QDialogButtonBox
 
-    def __init__(self, components: Collection[ComponentInitialization], folder="."):
+    def __init__(self, sequencer: ExperimentSequencer, components: Collection[ComponentInitialization], folder="."):
         super().__init__()
 
         # This loads the file and loads up each object as part of this class
@@ -75,20 +78,25 @@ class ComponentsDialog(QDialog):
         uic.loadUi(ui_file_path, self)
 
         self.folder = folder
+        self.sequencer = sequencer
 
         self.components_widgets = {}
         for component in components:
             self.components_widgets[component.name] = ComponentConfigWidget(component, folder)
             self.components_layout.addWidget(self.components_widgets[component.name])
 
-        self.load_all_button.pressed.connect(self.load_all_configuration)
-        self.save_all_button.pressed.connect(self.save_all_configuration)
+        self.load_run_button.pressed.connect(self.load_run_configuration)
+        self.save_run_button.pressed.connect(self.save_run_configuration)
+        self.load_sequence_button.pressed.connect(self.load_sequence)
+        self.save_sequence_button.pressed.connect(self.save_sequence)
 
         # Text
-        self.load_all_button.setText(localizator.get("load_all_configuration"))
-        self.save_all_button.setText(localizator.get("save_all_configuration"))
+        self.load_run_button.setText(localizator.get("load_run"))
+        self.save_run_button.setText(localizator.get("save_run"))
+        self.load_sequence_button.setText(localizator.get("load_sequence"))
+        self.save_sequence_button.setText(localizator.get("save_sequence"))
 
-    def load_all_configuration(self):
+    def load_run_configuration(self):
         options = QFileDialog.Options()
         file_dialog = QFileDialog()
         file_dialog.setDirectory(self.folder)
@@ -101,7 +109,7 @@ class ComponentsDialog(QDialog):
                 for name, comp_w in configs.items():
                     self.components_widgets[name].component.component.instrument.set_config(comp_w)
 
-    def save_all_configuration(self):
+    def save_run_configuration(self):
         options = QFileDialog.Options()
         file_dialog = QFileDialog()
         file_dialog.setDirectory(self.folder)
@@ -114,3 +122,25 @@ class ComponentsDialog(QDialog):
                 for name, comp_w in self.components_widgets.items():
                     combined_configs[name] = comp_w.component.component.instrument.get_config()
                 json.dump(combined_configs, file)
+
+    def load_sequence(self):
+        options = QFileDialog.Options()
+        file_dialog = QFileDialog()
+        file_dialog.setDirectory(self.folder)
+        file_name, _ = file_dialog.getOpenFileName(self, "Open File", "",
+                                                   "JavaScript Object Notation (*.json);;All Files (*)", options=options)
+
+        if file_name:
+            with open(file_name, "r+") as file:
+                self.sequencer.sequence = json.load(file)
+
+    def save_sequence(self):
+        options = QFileDialog.Options()
+        file_dialog = QFileDialog()
+        file_dialog.setDirectory(self.folder)
+        file_name, _ = file_dialog.getSaveFileName(self, "Save File", "",
+                                                   "JavaScript Object Notation (*.json);;All Files (*)", options=options)
+
+        if file_name:
+            with open(file_name, "w+") as file:
+                json.dump(self.sequencer.sequence, file)

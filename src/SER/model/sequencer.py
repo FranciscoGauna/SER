@@ -1,4 +1,4 @@
-from typing import Callable, Collection
+from typing import Callable, Collection, Any
 from logging import getLogger as get_logger
 
 from pimpmyclass.mixins import LogMixin
@@ -43,7 +43,7 @@ class ExperimentSequencer(LogMixin):
         self.sequence.append(new_run)
         self.log_info(f"Added new run: {new_run}")
 
-    def start_sequence(self, run_callback: Callable, point_callback: Callable):
+    def start_sequence(self, run_callback: Callable[[], Any], point_callback: Callable):
         # TODO: mention the initialize in documentation
         # We initialize every component
         for conf in self.runner.conf_comp:

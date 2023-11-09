@@ -2,8 +2,8 @@
 load_configuration: "Load Configuration"
 save_configuration: "Save Configuration"
 add_run_configuration: "Add Run Configuration"
-load_all_configuration: "Load All Configurations"
-save_all_configuration: "Save All Configurations"
+load_run: "Load Run Configuration"
+save_run: "Save Run Configuration"
 start_experiment: "Start Experiment"
 configuration: "Configuration"
 

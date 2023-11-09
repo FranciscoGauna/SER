@@ -98,7 +98,7 @@ class MainWidget(QStackedWidget, LogMixin):
         self.start_button.pressed.connect(self.start_experiment)
         self.add_run_button.pressed.connect(self.add_run)
         self.setCurrentWidget(self.conf_page)
-        self.configuration_dialog = ComponentsDialog(self.components, conf_folder)
+        self.configuration_dialog = ComponentsDialog(self.sequencer, self.components, conf_folder)
         self.load_conf_button.pressed.connect(self.configuration_dialog.show)
 
         # Text
