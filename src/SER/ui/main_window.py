@@ -1,3 +1,4 @@
+import json
 from os import path
 from threading import Thread, Lock
 from typing import Collection
@@ -5,10 +6,11 @@ from logging import getLogger as get_logger
 
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QTimer
-from PyQt5.QtWidgets import QGroupBox, QGridLayout, QPushButton, QProgressBar, QLabel, QStackedWidget, QTableView, \
-    QFileDialog
+from PyQt5.QtWidgets import QGroupBox, QGridLayout, QPushButton, QProgressBar, QLabel, QWidget, QTableView, \
+    QFileDialog, QStackedWidget, QListWidget
 from pimpmyclass.mixins import LogMixin
 
+from .color_list import ColorList
 from .components_dialog import ComponentsDialog
 from .data_table import TableModel
 from .localization import localizator
@@ -19,8 +21,10 @@ from ..model.documentation import to_md, to_htm
 from ..model.sequencer import ExperimentSequencer
 
 
-class MainWidget(QStackedWidget, LogMixin):
+class MainWidget(QWidget, LogMixin):
     sequence_ended = pyqtSignal()
+
+    run_list_widget: QListWidget
 
     conf_layout: QGridLayout
     run_layout: QGridLayout
@@ -43,9 +47,10 @@ class MainWidget(QStackedWidget, LogMixin):
     data_table: QTableView
     data_model: TableModel
 
-    conf_page: QStackedWidget
-    run_page: QStackedWidget
-    data_page: QStackedWidget
+    stack_widget: QStackedWidget
+    conf_page: QWidget
+    run_page: QWidget
+    data_page: QWidget
 
     conf_box: QGroupBox
     run_box: QGroupBox
@@ -80,8 +85,8 @@ class MainWidget(QStackedWidget, LogMixin):
         self.timer_started = False
         self.final_data_ui = final_data_ui
 
-        self.load_config_gui(conf_folder)
         self.load_run_gui()
+        self.load_config_gui(conf_folder)
         self.out_folder = out_folder
 
         self.sequence_ended.connect(self.sequence_end)
@@ -97,8 +102,8 @@ class MainWidget(QStackedWidget, LogMixin):
 
         self.start_button.pressed.connect(self.start_experiment)
         self.add_run_button.pressed.connect(self.add_run)
-        self.setCurrentWidget(self.conf_page)
-        self.configuration_dialog = ComponentsDialog(self.sequencer, self.components, conf_folder)
+        self.stack_widget.setCurrentWidget(self.conf_page)
+        self.configuration_dialog = ComponentsDialog(self.progress_manager, self.components, conf_folder)
         self.load_conf_button.pressed.connect(self.configuration_dialog.show)
 
         # Text
@@ -111,7 +116,8 @@ class MainWidget(QStackedWidget, LogMixin):
         self.log_debug(msg="Started loading run interface")
         progress_tracker = ProgressTracker(self.progress_bar, self.progress_label,
                                                 self.sequencer.runner.point_amount)
-        self.progress_manager = ProcessUIManager(self.run_data_ui, progress_tracker, self.sequencer.data)
+        self.progress_manager = ProcessUIManager(self.run_data_ui, progress_tracker, self.run_list_widget,
+                                                 self.sequencer)
         self.run_stop_button.pressed.connect(self.stop_experiment)
 
         for ui in self.run_data_ui:
@@ -143,7 +149,8 @@ class MainWidget(QStackedWidget, LogMixin):
         self.data_save_docs_htm_button.setText(localizator.get("save_as_html"))
 
     def add_run(self):
-        self.sequencer.add_run()
+        run = self.sequencer.add_run()
+        self.progress_manager.add_run(run)
 
     def start_experiment(self):
         """
@@ -153,7 +160,7 @@ class MainWidget(QStackedWidget, LogMixin):
         if not self.started:
             self.started = True
             self.log_debug(msg="Changing interface to the experiment interface")
-            self.setCurrentWidget(self.run_page)
+            self.stack_widget.setCurrentWidget(self.run_page)
             self.run_thread.start()
 
     def run_experiment(self):
@@ -165,7 +172,7 @@ class MainWidget(QStackedWidget, LogMixin):
     def stop_experiment(self):
         self.log_info(msg="Stopping the experiment prematurely with the button")
         self.sequencer.stop()
-        self.progress_manager.stop()
+        self.progress_manager.stop(premature=True)
 
     @pyqtSlot()
     def sequence_end(self):
@@ -173,7 +180,7 @@ class MainWidget(QStackedWidget, LogMixin):
         self.data_model = TableModel(self.sequencer.data.to_dataframe())
         self.data_table.setModel(self.data_model)
         self.load_data_gui()
-        self.setCurrentWidget(self.data_page)
+        self.stack_widget.setCurrentWidget(self.data_page)
 
     # Export Data
     def export_to_csv(self):

@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QGroupBox, QLabel, QProgressBar
 from PyQt5.QtCore import pyqtSignal
 from pimpmyclass.mixins import LogMixin
 
-from src.SER.ui.localization import localizator
+from .localization import localizator
 
 
 class ProgressTracker(LogMixin):

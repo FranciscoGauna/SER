@@ -42,6 +42,7 @@ class ExperimentSequencer(LogMixin):
             new_run[name] = instrument.get_config()
         self.sequence.append(new_run)
         self.log_info(f"Added new run: {new_run}")
+        return new_run
 
     def load_sequence(self, sequence):
         self.sequence = sequence

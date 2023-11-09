@@ -1,18 +1,25 @@
+import json
 from threading import Lock
 from typing import Collection
 from logging import getLogger as get_logger
 
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QTimer, QObject
+from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import QListWidget
 from pimpmyclass.mixins import LogMixin
 
+from .color_list import ColorList
 from ..interfaces import ProcessDataUI
 from ..model.data_repository import DataRepository
 from .progress_tracker import ProgressTracker
-
+from ..model.sequencer import ExperimentSequencer
 
 # Time between update ticks
 # TODO: Think about changing this to a parameter or an environment variable
 REFRESH_TIME = 50  # ms
+COLOR_RUN_END = "green"
+COLOR_RUN_IN_PROGRESS = "yellow"
+COLOR_RUN_STOPPED = "red"
 
 
 class ProcessUIManager(QObject, LogMixin):
@@ -25,12 +32,15 @@ class ProcessUIManager(QObject, LogMixin):
     # initialization level for the ui
     run_number = 0
 
-    def __init__(self, process_uis: Collection[ProcessDataUI], progress_tracker: ProgressTracker, data: DataRepository):
+    def __init__(self, process_uis: Collection[ProcessDataUI], progress_tracker: ProgressTracker,
+                 run_list: QListWidget, sequencer: ExperimentSequencer):
         super().__init__()
         self.logger = get_logger("SER.Core.UI.ProcessUIManager")
         self.process_uis = process_uis
+        self.run_list = ColorList(run_list)
         self.progress_tracker = progress_tracker
-        self.data = data
+        self.sequencer = sequencer
+        self.data = sequencer.data
 
         self.progress_list = []
         self.progress_lock = Lock()
@@ -38,8 +48,13 @@ class ProcessUIManager(QObject, LogMixin):
 
         self.run_started.connect(self.run_start)
 
-    def stop(self):
-        self.running = False
+    def stop(self, premature=False):
+        if self.running:
+            self.running = False
+            if premature:
+                self.run_list.set_color(self.run_number, QColor(COLOR_RUN_STOPPED))
+            else:
+                self.run_list.set_color(self.run_number, QColor(COLOR_RUN_END))
 
     def point_add(self):
         self.progress_lock.acquire()
@@ -64,6 +79,13 @@ class ProcessUIManager(QObject, LogMixin):
             self.run_number += 1
         self.progress_lock.release()
 
+        if self.run_number != 0:
+            self.run_list.set_color(self.run_number - 1, QColor(COLOR_RUN_END))
+            self.run_list.set_color(self.run_number, QColor(COLOR_RUN_IN_PROGRESS))
+        else:
+            self.run_list.set_color(self.run_number, QColor(COLOR_RUN_IN_PROGRESS))
+
+
     @pyqtSlot()
     def screen_tick(self):
         # Assignment operations are atomic, but we want to ensure that delta list isn't modified during the update
@@ -83,3 +105,16 @@ class ProcessUIManager(QObject, LogMixin):
             QTimer().singleShot(REFRESH_TIME, self.screen_tick)
 
         self.progress_lock.release()
+
+    def add_run(self, run: object):
+        self.run_list.add_item(json.dumps(run))
+
+    def load_sequence(self, sequence):
+        self.run_list.clean_list()
+        self.log_info(f"Sequence: {sequence}")
+        for run in sequence:
+            self.add_run(run)
+        self.sequencer.sequence = sequence
+
+    def sequence(self):
+        return self.sequencer.sequence

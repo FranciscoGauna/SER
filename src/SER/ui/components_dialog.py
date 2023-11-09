@@ -6,6 +6,7 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QDialog, QLabel, QPushButton, QFileDialog, QDialogButtonBox
 
 from .localization import localizator
+from .process_ui_manager import ProcessUIManager
 from ..interfaces import ComponentInitialization
 from ..model.sequencer import ExperimentSequencer
 
@@ -68,7 +69,7 @@ class ComponentsDialog(QDialog):
     save_sequence_button: QPushButton
     button_box: QDialogButtonBox
 
-    def __init__(self, sequencer: ExperimentSequencer, components: Collection[ComponentInitialization], folder="."):
+    def __init__(self, process_manager: ProcessUIManager, components: Collection[ComponentInitialization], folder="."):
         super().__init__()
 
         # This loads the file and loads up each object as part of this class
@@ -78,7 +79,7 @@ class ComponentsDialog(QDialog):
         uic.loadUi(ui_file_path, self)
 
         self.folder = folder
-        self.sequencer = sequencer
+        self.process_manager = process_manager
 
         self.components_widgets = {}
         for component in components:
@@ -132,7 +133,7 @@ class ComponentsDialog(QDialog):
 
         if file_name:
             with open(file_name, "r+") as file:
-                self.sequencer.load_sequence(json.load(file))
+                self.process_manager.load_sequence(json.load(file))
 
     def save_sequence(self):
         options = QFileDialog.Options()
@@ -143,4 +144,4 @@ class ComponentsDialog(QDialog):
 
         if file_name:
             with open(file_name, "w+") as file:
-                json.dump(self.sequencer.sequence, file)
+                json.dump(self.process_manager.sequence(), file)
