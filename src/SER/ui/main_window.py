@@ -91,8 +91,6 @@ class MainWidget(QWidget, LogMixin):
 
         self.sequence_ended.connect(self.sequence_end)
 
-        self.show()
-
     def load_config_gui(self, conf_folder):
         self.log_debug(msg="Started loading configuration interface")
 
