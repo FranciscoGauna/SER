@@ -60,6 +60,7 @@ class ExperimentSequencer(LogMixin):
         for run in self.sequence:
             for comp, conf in run.items():
                 self.components[comp].set_config(conf)
+            self.runner.setup_arg_tracker()
             if run_callback:
                 run_callback()
             self.runner.run_experiment(point_callback)

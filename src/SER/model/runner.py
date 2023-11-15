@@ -31,15 +31,7 @@ class ExperimentRunner(LogMixin):
         wrapped_fun = lambda *args: self.data.add_datum(name, fun(*args))
         return self.dispatcher.wrap(wrapped_fun)
 
-    def point_amount(self):
-        # This means we don't have currently a point amount (and also no arg_tracker)
-        if self.stopped:
-            return 1
-
-        return self.arg_tracker.points_amount()
-
-    def run_experiment(self, point_callback: Callable = None):
-        self.log_info("Starting Experiment Run")
+    def setup_arg_tracker(self):
 
         # We create the meta arg tracker
         # To do so we need a structure of each generator with the corresponding functions
@@ -53,6 +45,14 @@ class ExperimentRunner(LogMixin):
         ]
 
         self.arg_tracker = MetaArgTracker(generators)
+
+    def point_amount(self) -> int:
+        # This function should always be called after setup_arg_tracker
+        return self.arg_tracker.points_amount()
+
+    def run_experiment(self, point_callback: Callable = None):
+        # Precondition, call setup_arg_tracker
+        self.log_info("Starting Experiment Run")
         self.stopped = False
 
         # Main experimental loop
@@ -79,6 +79,3 @@ class ExperimentRunner(LogMixin):
         self.stopped = True
 
         self.log_info("Ending Experiment Run")
-
-    def point_amount(self) -> int:
-        return self.arg_tracker.points_amount()
