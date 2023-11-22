@@ -15,7 +15,7 @@ class ComponentInitialization:
 
     def __init__(self, component: Component, coupling: int, x: int, y: int, name: str = None):
         self.component = component
-        self.coupling = coupling
+        self.component.instrument.coupling = coupling
         self.x = x
         self.y = y
         if name is None:

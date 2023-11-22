@@ -35,6 +35,10 @@ class ObservableInstrument(Instrument):
 
 
 class ConfigurableInstrument(Instrument):
+    coupling: int = 0
+
+    def set_coupling(self, value):
+        self.coupling = value
 
     @abstractmethod
     def configure(self, *args) -> Dict[str, Any]:

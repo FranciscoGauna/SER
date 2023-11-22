@@ -37,7 +37,7 @@ class ExperimentRunner(LogMixin):
         # To do so we need a structure of each generator with the corresponding functions
         generators = [
             (
-                comp.coupling,
+                comp.component.instrument.coupling,
                 comp.component.instrument.get_points,
                 self.wrap_fun(comp.name, comp.component.instrument.configure)
             )

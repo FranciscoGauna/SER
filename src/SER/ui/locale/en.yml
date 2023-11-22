@@ -7,6 +7,8 @@ save_run: "Save Run Configuration"
 start_experiment: "Start Experiment"
 configuration: "Configuration"
 
+coupling: "Coupling"
+
 # Run
 running: "Running"
 progress: "Progress"

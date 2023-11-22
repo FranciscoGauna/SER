@@ -24,12 +24,13 @@ log_to_screen()
 launch_app(
     app, [
         ComponentInitialization(motor_1, 0, 0, 0, "motor 1"),
-        # ComponentInitialization(VirtualPlatina(), 1, 1, 0, "motor 2"),
+        ComponentInitialization(VirtualPlatina(), 1, 1, 0, "motor 2"),
     ], [
         ComponentInitialization(RandValue(), 1, 0, 1),
     ],
     [mapper],
-    [mapper]
+    [mapper],
+    coupling_ui_options={"enabled": True, "x": 1, "y": 1}
 )
 with open("motor_1.json", "w+") as file:
     json.dump(motor_1.instrument.get_config(), file)

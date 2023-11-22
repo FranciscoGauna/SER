@@ -1,7 +1,7 @@
 import json
 from os import path
 from threading import Thread, Lock
-from typing import Collection
+from typing import Collection, Any
 from logging import getLogger as get_logger
 
 from PyQt5 import uic
@@ -10,8 +10,8 @@ from PyQt5.QtWidgets import QGroupBox, QGridLayout, QPushButton, QProgressBar, Q
     QFileDialog, QStackedWidget, QListWidget
 from pimpmyclass.mixins import LogMixin
 
-from .color_list import ColorList
 from .components_dialog import ComponentsDialog
+from .coupling_ui import CouplingUI
 from .data_table import TableModel
 from .localization import localizator
 from .process_ui_manager import ProcessUIManager
@@ -58,8 +58,8 @@ class MainWidget(QWidget, LogMixin):
     data_box: QGroupBox
 
     def __init__(self, components: Collection[ComponentInitialization], run_data_ui: Collection[ProcessDataUI],
-                 final_data_ui: Collection[FinalDataUI], sequencer: ExperimentSequencer, conf_folder=".",
-                 out_folder="."):
+                 final_data_ui: Collection[FinalDataUI], sequencer: ExperimentSequencer,
+                 coupling_ui_options: dict[str, Any], conf_folder=".", out_folder="."):
         super().__init__()
 
         # This loads the file and loads up each object as part of this class
@@ -86,17 +86,23 @@ class MainWidget(QWidget, LogMixin):
         self.final_data_ui = final_data_ui
 
         self.load_run_gui()
-        self.load_config_gui(conf_folder)
+        self.load_config_gui(conf_folder,  coupling_ui_options)
         self.out_folder = out_folder
 
         self.sequence_ended.connect(self.sequence_end)
 
-    def load_config_gui(self, conf_folder):
+    def load_config_gui(self, conf_folder: str, coupling_ui_options: dict[str, Any]):
         self.log_debug(msg="Started loading configuration interface")
 
         for component in self.components:
             if component.component.conf_ui is not None:
                 self.conf_layout.addWidget(component.component.conf_ui, component.y, component.x)
+
+        # TODO: Document the couplingUI options
+        self.coupling_config = CouplingUI(self.components)
+        if coupling_ui_options.get("enabled", False):
+            self.conf_layout.addWidget(self.coupling_config,
+                                       coupling_ui_options.get("y", 0), coupling_ui_options.get("x", 0))
 
         self.start_button.pressed.connect(self.start_experiment)
         self.add_run_button.pressed.connect(self.add_run)
