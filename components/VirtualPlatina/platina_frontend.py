@@ -100,17 +100,17 @@ class PointSelectBackend(ConfigurableInstrument):
             "amount": str(self._y_amount),
             "init": str(self._y_init),
             "final": str(self._y_final),
-        }, "coupling": str(self.coupling)}
-        return config
+        }}
+        return config | super().get_config()
 
     def set_config(self, config: Dict):
+        super().set_config(config)
         self.x_amount = int(config["X"]["amount"])
         self.x_init = float(config["X"]["init"])
         self.x_final = float(config["X"]["final"])
         self.y_amount = int(config["Y"]["amount"])
         self.y_init = float(config["Y"]["init"])
         self.y_final = float(config["Y"]["final"])
-        self.coupling = int(config["coupling"])
 
 
 class PointSelectFrontend(ConfigurationUI):

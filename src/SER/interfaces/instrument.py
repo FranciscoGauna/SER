@@ -40,6 +40,13 @@ class ConfigurableInstrument(Instrument):
     def set_coupling(self, value):
         self.coupling = value
 
+    # For the configurable Instrument, coupling is always a setting we bring
+    def set_config(self, config: Dict):
+        self.coupling = config["coupling"]
+
+    def get_config(self) -> Dict:
+        return {"coupling": self.coupling}
+
     @abstractmethod
     def configure(self, *args) -> Dict[str, Any]:
         raise NotImplementedError("The method configure has not been implemented")
