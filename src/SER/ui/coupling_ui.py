@@ -20,7 +20,7 @@ class CouplingUI(QGroupBox):
 
         y = 0
         for comp in config_componentes:
-            # TODO: rethink this shit
+            # TODO: rethink this
             if not isinstance(comp.component.instrument, ConfigurableInstrument):
                 continue
 
