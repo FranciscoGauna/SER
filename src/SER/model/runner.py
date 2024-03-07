@@ -50,6 +50,7 @@ class ExperimentRunner(LogMixin):
 
     def point_amount(self) -> int:
         # This function should always be called after setup_arg_tracker
+        # TODO: rethink if we should grab the lenght of the generators in the metargtracker with a function
         return self.arg_tracker.points_amount()
 
     def run_experiment(self, point_callback: Callable = None):

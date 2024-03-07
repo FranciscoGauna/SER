@@ -39,6 +39,8 @@ class MultipleArgTracker:
                 function(*arg)
 
     def amount(self) -> int:
+        # TODO: write this in the documentation
+        """Note that to calculate the amount of points the generator will be called in entirety once."""
         return len(list(self.gen_fun[0]()))
 
 
