@@ -64,6 +64,9 @@ class ExperimentSequencer(LogMixin):
             if run_callback:
                 run_callback()
             self.runner.run_experiment(point_callback)
+            # If we have an error we stop the run and alert the user in the
+            if self.runner.error is not None:
+                break
             self.data.next_run()
             if self.stopped:
                 break
@@ -75,3 +78,5 @@ class ExperimentSequencer(LogMixin):
             conf.component.instrument.finalize()
         for observe in self.runner.observe_comp:
             observe.component.instrument.finalize()
+
+        return self.runner.error

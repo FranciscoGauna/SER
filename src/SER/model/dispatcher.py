@@ -39,4 +39,7 @@ class Dispatcher(LogMixin):
             futures = [executor.submit(execute_fun, task) for task in self.tasks]
         self.tasks.clear()
 
-        return [f.result() for f in futures]
+        results = []
+        for f in futures:
+            results.append(f.result())
+        return results

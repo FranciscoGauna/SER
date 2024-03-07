@@ -1,13 +1,14 @@
 import json
 from os import path
 from threading import Thread, Lock
+from traceback import format_exception_only
 from typing import Collection, Any
 from logging import getLogger as get_logger
 
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QTimer
 from PyQt5.QtWidgets import QGroupBox, QGridLayout, QPushButton, QProgressBar, QLabel, QWidget, QTableView, \
-    QFileDialog, QStackedWidget, QListWidget
+    QFileDialog, QStackedWidget, QListWidget, QMessageBox
 from pimpmyclass.mixins import LogMixin
 
 from .components_dialog import ComponentsDialog
@@ -72,6 +73,7 @@ class MainWidget(QWidget, LogMixin):
         self.components = components
         self.sequencer = sequencer
         self.run_thread = Thread(target=self.run_experiment)
+        self.error = None  # If we have found an error that forced the run experiment to end, we save the exception here
         self.started = False
         self.logger = get_logger("SER.Core.MainWindow")
 
@@ -169,8 +171,8 @@ class MainWidget(QWidget, LogMixin):
 
     def run_experiment(self):
         self.log_debug(msg="Changing interface to the data interface")
-        self.sequencer.start_sequence(self.progress_manager.run_started.emit,
-                                      self.progress_manager.point_add)
+        self.error = self.sequencer.start_sequence(self.progress_manager.run_started.emit,
+                                                   self.progress_manager.point_add)
         self.sequence_ended.emit()
 
     def stop_experiment(self):
@@ -185,6 +187,12 @@ class MainWidget(QWidget, LogMixin):
         self.data_table.setModel(self.data_model)
         self.load_data_gui()
         self.stack_widget.setCurrentWidget(self.data_page)
+
+        if self.error is not None:
+            error_box = QMessageBox()
+            error_box.setText(f"There was an exception during the execution of the program:\n"
+                              f"{''.join(format_exception_only(self.error))}")
+            error_box.exec()
 
     # Export Data
     def export_to_csv(self):

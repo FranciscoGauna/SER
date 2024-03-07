@@ -1,4 +1,5 @@
 from datetime import datetime
+from traceback import format_exc
 from typing import Collection, Callable
 
 from lantz.core.log import get_logger
@@ -23,6 +24,7 @@ class ExperimentRunner(LogMixin):
         self.observe_comp = observable_components
         self.conf_comp = configurable_components
         self.data = data
+        self.error = None
 
         # We create an instance of the dispatcher:
         self.dispatcher = Dispatcher()
@@ -56,25 +58,34 @@ class ExperimentRunner(LogMixin):
         self.stopped = False
 
         # Main experimental loop
-        while not self.stopped and self.arg_tracker.advance():
-            self.data.next()
-            config_time_start = datetime.now()
-            self.dispatcher.execute()
-            observe_time_start = datetime.now()
-
-            for comp in self.observe_comp:
-                self.wrap_fun(comp.name, comp.component.instrument.observe)()
+        try:
+            while not self.stopped and self.arg_tracker.advance():
+                self.log_debug("Advanced Generator")
+                self.data.next()
+                config_time_start = datetime.now()
                 self.dispatcher.execute()
+                self.log_debug("Executed Configurator Dispatch")
+                observe_time_start = datetime.now()
 
-            self.data.add_datum("timestamp", {
-                "config_start_time": config_time_start,
-                "observe_start_time": observe_time_start,
-                "end_time": datetime.now()
-            })
+                for comp in self.observe_comp:
+                    self.wrap_fun(comp.name, comp.component.instrument.observe)()
 
-            if point_callback:
-                point_callback()
-            self.log_debug("Advanced one iteration")
+                self.dispatcher.execute()
+                self.log_debug("Executed Observer Dispatch")
+
+                self.data.add_datum("timestamp", {
+                    "config_start_time": config_time_start,
+                    "observe_start_time": observe_time_start,
+                    "end_time": datetime.now()
+                })
+                self.log_debug("Added datum")
+
+                if point_callback:
+                    point_callback()
+                self.log_debug("Advanced one iteration")
+        except Exception as e:
+            self.log_error(f"There has been an exception! {format_exc()}")
+            self.error = e
 
         self.stopped = True
 
