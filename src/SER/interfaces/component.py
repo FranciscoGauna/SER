@@ -1,13 +1,12 @@
 from typing import Callable
 
 from . import Instrument
-from . import ConfigurationUI, ProcessUI
+from . import ConfigurationUI
 
 
 class Component:
     instrument: Instrument
     conf_ui: ConfigurationUI
-    run_ui: ProcessUI  # UI for tracking a single component and modify during execution if necessary
 
 
 class ComponentInitialization:

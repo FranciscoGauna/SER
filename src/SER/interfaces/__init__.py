@@ -1,3 +1,3 @@
 from .instrument import Instrument, ObservableInstrument, ConfigurableInstrument
-from .user_interface import ConfigurationUI, ProcessUI, ProcessDataUI, FinalDataUI
+from .user_interface import ConfigurationUI, ProcessDataUI, FinalDataUI
 from .component import Component, ComponentInitialization

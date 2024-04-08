@@ -20,27 +20,9 @@ class ConfigurationUI(Frontend):
         self.logger = get_logger(self.logger_name)
 
 
-class ProcessUI(Frontend):
-    """This class represents the User Interface that is displayed to the during the execution of the experiment. It
-    provides the user with a live tracking of the results of the experiment, and if applicable, controls that may
-    be required during its execution."""
-
-    # This is a recommendation, you can rename the instrument to something else
-    instrument: Instrument
-
-    def __init__(self, parent=None, backend=None):
-        super().__init__(parent, backend)
-        self.logger_name = 'SER.UI.ProcessUI.' + str(self)
-        self.logger = get_logger(self.logger_name)
-
-    @abstractmethod
-    def set_result(self, *args):
-        raise NotImplementedError("The function set_result was not implemented")
-
-
 class ProcessDataUI(Frontend):
     """This class represents the User Interface that displays the data from experiment during its execution.
-    It gets updated at the end of each iteration with the method set_result."""
+    It gets updated at the end of each iteration with the method add_data."""
 
     # This is a recommendation, you can rename the instrument to something else
     instrument: Instrument
@@ -62,7 +44,7 @@ class ProcessDataUI(Frontend):
 
     @abstractmethod
     def add_data(self, data: List[Dict[str, Dict[str, Any]]]):
-        raise NotImplementedError("The function set_result was not implemented")
+        raise NotImplementedError("The function add_data was not implemented")
 
 
 class FinalDataUI(Frontend):
@@ -84,4 +66,4 @@ class FinalDataUI(Frontend):
 
     @abstractmethod
     def set_data(self, data: List[Dict[str, Dict[str, Any]]]):
-        raise NotImplementedError("The function set_result was not implemented")
+        raise NotImplementedError("The function set_data was not implemented")
