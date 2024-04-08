@@ -26,6 +26,11 @@ class Instrument(Backend):
         what it represents, what is the range of value and what is the unit."""
         raise NotImplementedError("The method variable_documentation has not been implemented")
 
+    def stop(self):
+        """This methods gets called if the experiment stopped prematurely by the user. If that's the case, do any
+        procedures necessary to stop the insturment"""
+        return
+
 
 class ObservableInstrument(Instrument):
 

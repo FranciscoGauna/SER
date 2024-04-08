@@ -32,9 +32,12 @@ class ExperimentSequencer(LogMixin):
         self.stopped = True
         self.logger = get_logger("SER.Core.Sequencer")
 
-    def stop(self):
+    def stop(self, premature=False):
         self.stopped = True
         self.runner.stopped = True
+        if premature:
+            for instrument in self.components.values():
+                instrument.stop()
 
     def add_run(self):
         new_run = {}

@@ -177,7 +177,7 @@ class MainWidget(QWidget, LogMixin):
 
     def stop_experiment(self):
         self.log_info(msg="Stopping the experiment prematurely with the button")
-        self.sequencer.stop()
+        self.sequencer.stop(premature=True)
         self.progress_manager.stop(premature=True)
 
     @pyqtSlot()
