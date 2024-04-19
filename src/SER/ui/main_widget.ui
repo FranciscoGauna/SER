@@ -14,28 +14,17 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="1">
-    <widget class="QListWidget" name="run_list_widget"/>
-   </item>
    <item row="0" column="0">
     <widget class="QStackedWidget" name="stack_widget">
      <property name="windowTitle">
       <string>StackedWidget</string>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="conf_page">
       <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
-        <widget class="QGroupBox" name="conf_box">
-         <property name="title">
-          <string>Configuration</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_4"/>
-        </widget>
-       </item>
-       <item row="1" column="0">
+       <item row="2" column="0">
         <layout class="QHBoxLayout" name="start_layout">
          <property name="sizeConstraint">
           <enum>QLayout::SetDefaultConstraint</enum>
@@ -75,6 +64,14 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item row="1" column="0">
+        <widget class="QGroupBox" name="conf_box">
+         <property name="title">
+          <string>Configuration</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_4"/>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -207,6 +204,9 @@
       </layout>
      </widget>
     </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QListWidget" name="run_list_widget"/>
    </item>
   </layout>
  </widget>
