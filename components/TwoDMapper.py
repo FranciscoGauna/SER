@@ -16,50 +16,55 @@ matplotlib.use('Qt5Agg')
 
 
 class TwoDMapper(ProcessDataUI):
-    data: List[List[Any]]
+    data: List[tuple[Any, Any, float]]
 
-    def __init__(self, width_fun, height_fun, x, y, motor_name, value_name: tuple[str, str], parent=None, backend=None):
+    def __init__(self, x_variable: tuple[str, str, str], y_variable: tuple[str, str, str],
+                 z_variable: tuple[str, str, str], x=0, y=0, parent=None, backend=None):
         super().__init__(x, y, parent, backend)
-        self.width_fun = width_fun
-        self.height_fun = height_fun
-        self.motor_name = motor_name
-        self.value_name = value_name
-        self.last_value = None
+        self.x_device, self.x_var_name, self.x_display_name = x_variable
+        self.y_device, self.y_var_name, self.y_display_name = y_variable
+        self.z_device, self.z_var_name, self.z_display_name = z_variable
+        self.last_x = 0
+        self.last_y = 0
 
-        self.x_counter = 0
+        # The y counter is necessary because we need it to be a consistent shape the figure
         self.y_counter = 0
 
     def initialize(self):
-        self.width = self.width_fun()
-        self.height = self.height_fun()
-        self.data = [[None for _ in range(self.width)] for _ in range(self.height)]
-        self.canvas = PlotCanvas(self.data)
+        self.data = []
+        self.canvas = PlotCanvas([[None]])
         self.setCentralWidget(self.canvas)
-        self.x_counter = 0
+        self.last_x = 0
+        self.last_y = 0
         self.y_counter = 0
 
     def add_data(self, data: List[Dict[str, Dict[str, Any]]]):
+        parsed_matrix: List[List[float | None]] = []
+
         for datum in data:
-            if self.motor_name not in datum:
-                return
+            if self.x_device in datum:
+                self.last_x = datum[self.x_device][self.x_var_name]
 
-            if self.value_name[0] in datum:
-                self.last_value = datum[self.value_name[0]][self.value_name[1]]
+            if self.y_device in datum:
+                self.last_y = datum[self.y_device][self.y_var_name]
 
-            x = datum[self.motor_name]["x"]
-            y = datum[self.motor_name]["y"]
+            if self.z_device in datum:
+                self.data.append((self.last_x, self.last_y, float(datum[self.z_device][self.z_var_name])))
 
-            if self.x_counter >= self.width:
-                self.x_counter = 0
-                self.y_counter += 1
+        x_set = set(map(lambda tup: tup[0], self.data))
+        y_set = set(map(lambda tup: tup[1], self.data))
+        parsed_dictionary: Dict[Any, Dict[Any, float | None]] = dict()
+        for x in x_set:
+            parsed_dictionary[x] = {}
+            for y in y_set:
+                parsed_dictionary[x][y] = None
 
-            # TODO: remove ugly hack
-            time_delta: timedelta = datum["timestamp"]["end_time"] - datum["timestamp"]["config_start_time"]
-            self.data[self.y_counter][self.x_counter] = time_delta.total_seconds()
+        for datum in self.data:
+            parsed_dictionary[datum[0]][datum[1]] = datum[2]
 
-            self.x_counter += 1
-        self.canvas.update_with_data(self.data)
-
+        for _, v in parsed_dictionary.items():
+            parsed_matrix.append(list(v.values()))
+        self.canvas.update_with_data(parsed_matrix)
 
 
 class PlotCanvas(FigureCanvasQTAgg):

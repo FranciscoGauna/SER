@@ -1,3 +1,4 @@
+from cProfile import runctx
 from typing import Callable, Collection, Any
 from logging import getLogger as get_logger
 
@@ -66,6 +67,7 @@ class ExperimentSequencer(LogMixin):
             self.runner.setup_arg_tracker()
             if run_callback:
                 run_callback()
+
             self.runner.run_experiment(point_callback)
             # If we have an error we stop the run and alert the user in the
             if self.runner.error is not None:

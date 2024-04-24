@@ -85,13 +85,13 @@ class ProcessUIManager(QObject, LogMixin):
         else:
             self.run_list.set_color(self.run_number, QColor(COLOR_RUN_IN_PROGRESS))
 
-
     @pyqtSlot()
     def screen_tick(self):
         # Assignment operations are atomic, but we want to ensure that delta list isn't modified during the update
         self.progress_lock.acquire()
         delta_list = self.progress_list
         self.progress_list = []
+        self.progress_lock.release()
 
         # we filter the delta_list to only the latest run initialized
         delta_list = list(filter(lambda x: x["run"]["id"] == self.run_number, delta_list))
@@ -103,8 +103,6 @@ class ProcessUIManager(QObject, LogMixin):
 
         if self.running:
             QTimer().singleShot(REFRESH_TIME, self.screen_tick)
-
-        self.progress_lock.release()
 
     def add_run(self, run: object):
         self.run_list.add_item(json.dumps(run))
