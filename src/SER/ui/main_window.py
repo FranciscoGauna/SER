@@ -127,7 +127,7 @@ class MainWidget(QWidget, LogMixin):
         self.run_stop_button.pressed.connect(self.stop_experiment)
 
         for ui in self.run_data_ui:
-            self.run_layout.addWidget(ui, ui.x, ui.y)
+            self.run_layout.addWidget(ui, ui.y, ui.x)
 
         for component in self.components:
             if component.component.conf_ui is not None:
@@ -145,7 +145,7 @@ class MainWidget(QWidget, LogMixin):
         self.data_save_mat_button.pressed.connect(self.export_to_matlab)
         self.data_save_csv_button.pressed.connect(self.export_to_csv)
         for ui in self.final_data_ui:
-            self.data_layout.addWidget(ui, ui.x, ui.y)
+            self.data_layout.addWidget(ui, ui.y, ui.x)
 
         # Text
         self.data_box.setTitle(localizator.get("data"))
