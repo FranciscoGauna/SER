@@ -1,6 +1,6 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "SER"
@@ -14,6 +14,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+dynamic = ["dependencies"]
 
 
 [tool.pytest.ini_options]
@@ -23,3 +24,12 @@ addopts = ["--import-mode=importlib"]
 [project.urls]
 "Homepage" = "https://github.com/FranciscoGauna/SER"
 "Bug Tracker" = "https://github.com/FranciscoGauna/SER"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools.packages.find]
+where = ["src"]

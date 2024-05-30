@@ -1,0 +1,2 @@
+include src/SER/ui/locale/*.yml
+include src/SER/ui/*.ui
