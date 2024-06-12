@@ -30,6 +30,7 @@ launch_app(
     ],
     [mapper],
     [mapper],
+    locale="es"
     # coupling_ui_options={"enabled": True, "x": 1, "y": 1}
 )
 with open("motor_1.json", "w+") as file:

@@ -15,7 +15,7 @@ class Localizator(LogMixin):
     def set(self, locale="en", file_path=None):
         if file_path is None:
             file_path = path.join(path.dirname(path.realpath(__file__)), "locale", f"{locale}.yml")
-        with open(file_path, "r+") as file:
+        with open(file_path, "r+", encoding="utf-8") as file:
             self.locale_dict = yaml.safe_load(file)
 
     def get(self, key: str) -> str:
