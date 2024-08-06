@@ -14,21 +14,37 @@ class Instrument(Backend):
 
     @abstractmethod
     def get_config(self) -> Dict:
+        """
+        This is used to save the configration parameters for each run. The values are saved on a json format when
+        serialized in a file format. As such, return only objects that can be saved in that format.
+
+        :returns: a dictionary of configuration parameters and their values.
+        """
         raise NotImplementedError("The method get_config has not been implemented")
 
     @abstractmethod
-    def set_config(self, config: Dict):
+    def set_config(self, config: Dict) -> None:
+        """
+        This is used to restore the configration parameters for each run. The values are saved on a json format when
+        serialized in a file format. As such, return only objects that can be saved in that format.
+        """
         raise NotImplementedError("The method set_config has not been implemented")
 
     @abstractmethod
     def variable_documentation(self) -> Dict[str, str]:
-        """This method should return a string containing the documentation for each kind of variable, including
-        what it represents, what is the range of value and what is the unit."""
+        """
+        This method should return a string containing the documentation for each kind of variable, including
+        what it represents, what is the range of value and what is the unit.
+
+        :returns: a dictionary of variable names and their documentation.
+        """
         raise NotImplementedError("The method variable_documentation has not been implemented")
 
-    def stop(self):
-        """This methods gets called if the experiment stopped prematurely by the user. If that's the case, do any
-        procedures necessary to stop the insturment"""
+    def stop(self) -> None:
+        """
+        This method gets called if the experiment stopped prematurely by the user. If that's the case, do any
+        procedures necessary to stop the instrument
+        """
         return
 
 
