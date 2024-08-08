@@ -1,10 +1,8 @@
 # Scientific Experiment Runner - Developer Documentation
 
 This module provides a framework for developing and controlling hardware in a GUI application.
-
-This readme is for developers that want to build with SER. If you want to see
-how to operate a SER application, see the following documentation
-[Scientific Experiment Runner - User Documentation](readme_user.md)
+This readme is for developers that want to build with the Scientific Experiment Runner
+(SER).
 
 For spanish documentation see [Scientific Experiment Runner - Spanish](readme_es.md)
 
@@ -17,6 +15,9 @@ the developer and managed centrally by the SER. SER also provides a consistent s
 UI in which the component's UI is embedded, and a series of useful commands
 for the user.
 
+Example use case: coordinating a translation stage containing a sample, 
+a probing laser heating the material and a lock-in amplifier to measure the laser distortion.
+
 ## Dependencies
 
 ### Lantz
@@ -25,11 +26,38 @@ The core dependency of the SER is [Lantz](https://github.com/lantzproject), whic
 provides the base clases of Backend and Frontend as the backbone of the component
 system. It is recommended that SER components are developed with Lantz
 [drivers](https://github.com/lantzproject/lantz-drivers) and Lantz
-[QT helper functions](https://github.com/lantzproject/lantz-qt).
+[Qt helper functions](https://github.com/lantzproject/lantz-qt).
 
-## Model
+### Qt
 
+For the development of the user graphical interface SER we utilize the 
+[QT Framework](https://doc.qt.io/qt-5/qtgui-index.html) through its python bindings
+called [PyQt](https://pypi.org/project/PyQt5/). For the development of interfaces it 
+is recommended the [Qt gui designer application](https://doc.qt.io/qt-6/qtdesigner-manual.html)
+, that can be downloaded through PyPi with [pyqt5-tools](https://pypi.org/project/pyqt5-tools/).
 
+## Architecture
+
+The application is designed with a Model View Controller model, with Qt handling
+the View Controller part.
+
+### Model
+
+The core purpose of the model is to coordinate the different configurations for each
+device in order to take the measurements. Each device can provide a series of "points"
+that need to configured in the device to take the sample. Consider the Summary's example case:
+the sample needs to be measured at different place and with different frequencies
+from the laser probe. SER in a multithreaded fashion handles giving each instrument
+the correct argument and storing the result.
+
+#### Instruments
+
+Instruments are the class meant to represent a single piece of hardware in our model.
+Examples include: a function generator, a translation stage or a Digital to Analog Converter.
+
+#### Coupling
+
+### View Controller
 
 ## API Documentation
 
