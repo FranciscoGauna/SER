@@ -59,6 +59,9 @@ class ConfigurableInstrument(Instrument):
     coupling: int = 0
 
     def set_coupling(self, value):
+        """
+        Sets the coupling to the given value
+        """
         self.coupling = value
 
     # For the configurable Instrument, coupling is always a setting we bring
