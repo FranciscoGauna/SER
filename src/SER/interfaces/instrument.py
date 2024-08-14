@@ -76,7 +76,7 @@ class ConfigurableInstrument(Instrument):
         raise NotImplementedError("The method configure has not been implemented")
 
     @abstractmethod
-    def get_points(self) -> Generator:
+    def get_points(self) -> Generator[Tuple, None, None]:
         """
         The function get_points is tasked with providing the points a component will use during its execution.
         The way it does this is through python Generators, as the task reads the task point by point. You can also

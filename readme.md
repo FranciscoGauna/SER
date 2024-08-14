@@ -20,6 +20,10 @@ a probing laser heating the material and a lock-in amplifier to measure the lase
 
 ## Dependencies
 
+A pip requirements file is provided, with a `frozenreqs.txt` file specifying the
+version with which it was tested. The python version used was 3.11.
+
+
 ### Lantz
 
 The core dependency of the SER is [Lantz](https://github.com/lantzproject), which 
@@ -36,6 +40,14 @@ called [PyQt](https://pypi.org/project/PyQt5/). For the development of interface
 is recommended the [Qt gui designer application](https://doc.qt.io/qt-6/qtdesigner-manual.html)
 , that can be downloaded through PyPi with [pyqt5-tools](https://pypi.org/project/pyqt5-tools/).
 
+## Testing
+
+There are unit test available for components in the model. 
+These can be run with `python -m pytest tests`.
+
+There is also available a sample program to see the interface, available with
+`python main.py`
+
 ## Architecture
 
 The application is designed with a Model View Controller model, with Qt handling
@@ -50,12 +62,33 @@ the sample needs to be measured at different place and with different frequencie
 from the laser probe. SER in a multithreaded fashion handles giving each instrument
 the correct argument and storing the result.
 
+![UML Activity Diagram](/Documentation/UML%20Run%20Activity%20Diagram.png)
+
 #### Instruments
 
 Instruments are the class meant to represent a single piece of hardware in our model.
 Examples include: a function generator, a translation stage or a Digital to Analog Converter.
+Each device can be categorized in either a configurable instrument or observable instrument.
+Configurable instruments are those who need to be set up before a measure is taken. These
+are the devices that provide "points" for configuration to the SER. In our
+Summary's example case the function generator and translation unit are the configurable 
+instruments. The other kind of instruments are those which are observable. These instruments
+are those who store that take the measurements once all of the configurable instruments
+are observed. In our example case the lock-in amplifier would be the observable
+instrument.
 
 #### Coupling
+
+Each configurable instrument has a parameter called coupling. This parameter
+dictates the pattern in which the "points" provided by each configurable device
+are sent to each device. The device with the higher coupling value will iterate
+over the points first. If two devices share the same coupling value, they will be coupled
+meaning they receive the point at the same time. Consider this example for our use case:
+we have the translation unit providing the points (1mm, 2mm) and the function generator
+providing the frequencies (10Hz, 100Hz). If the function generator has a higher coupling
+value, the resulting configurations will look like this:
+(1mm, 10Hz) -> (1mm, 100Hz) -> (2mm, 10Hz) -> (2mm, 100Hz). For more examples, see 
+the [test file for the arg tracker](tests/generator_test.py)
 
 ### View Controller
 

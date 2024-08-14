@@ -2,5 +2,6 @@ pandas
 PyQt5
 scipy
 mistune
+matplotlib
 lantzdev @ git+https://github.com/lantzproject/lantz-core.git#egg=lantzdev
 lantz.qt @ git+https://github.com/lantzproject/lantz-qt.git#egg=lantz.qt
