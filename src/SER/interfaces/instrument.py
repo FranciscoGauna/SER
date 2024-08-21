@@ -18,7 +18,7 @@ class Instrument(Backend):
         This is used to save the configration parameters for each run. The values are saved on a json format when
         serialized in a file format. As such, return only objects that can be saved in that format.
 
-        :returns: a dictionary of configuration parameters and their values.
+        :return: a dictionary of configuration parameters and their values.
         """
         raise NotImplementedError("The method get_config has not been implemented")
 
@@ -36,7 +36,7 @@ class Instrument(Backend):
         This method should return a string containing the documentation for each kind of variable, including
         what it represents, what is the range of value and what is the unit.
 
-        :returns: a dictionary of variable names and their documentation.
+        :return: a dictionary of variable names and their documentation.
         """
         raise NotImplementedError("The method variable_documentation has not been implemented")
 
@@ -51,7 +51,12 @@ class Instrument(Backend):
 class ObservableInstrument(Instrument):
 
     @abstractmethod
-    def observe(self, *args) -> Dict[str, Any]:
+    def observe(self) -> Dict[str, Any]:
+        """
+        This method gets called on each iteration points of the experiment.
+
+        :return: a dictionary of observable parameters and their values.
+        """
         raise NotImplementedError("The method observe has not been implemented")
 
 
@@ -66,13 +71,31 @@ class ConfigurableInstrument(Instrument):
 
     # For the configurable Instrument, coupling is always a setting we bring
     def set_config(self, config: Dict):
+        """
+        This is used to restore the configration parameters for each run. The values are saved on a json format when
+        serialized in a file format. As such, return only objects that can be saved in that format. The super
+        call for this function includes coupling, so it should be called on reimplementation.
+        """
         self.coupling = config["coupling"]
 
     def get_config(self) -> Dict:
+        """
+        This is used to save the configration parameters for each run. The values are saved on a json format when
+        serialized in a file format. As such, return only objects that can be saved in that format. The super
+        call for this function includes coupling, so it should be called on reimplementation.
+
+        :return: a dictionary of configuration parameters and their values.
+        """
         return {"coupling": self.coupling}
 
     @abstractmethod
     def configure(self, *args) -> Dict[str, Any]:
+        """
+        This method gets called on each iteration points of the experiment. It receives an unrolled tuple,
+        so you can replace *args with your arguments.
+        
+        :return: a dictionary of relevant parameters and their values.
+        """
         raise NotImplementedError("The method configure has not been implemented")
 
     @abstractmethod
@@ -90,4 +113,7 @@ class ConfigurableInstrument(Instrument):
 
     @abstractmethod
     def point_amount(self) -> int:
+        """
+        :return: the amount of points this instrument generates with the Generator from get_points
+        """
         return 0

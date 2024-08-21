@@ -1,3 +1,6 @@
+# Generic
+SER: "Scientific Experiment Runner"
+
 # Conf
 load_configuration: "Load Configuration"
 save_configuration: "Save Configuration"

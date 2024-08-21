@@ -5,6 +5,18 @@ from datetime import datetime
 from src.SER.model.gen import MetaArgTracker
 
 
+"""
+Each configurable instrument has a parameter called coupling. This parameter
+dictates the pattern in which the "points" provided by each configurable device
+are sent to each device. The device with the higher coupling value will iterate
+over the points first. If two devices share the same coupling value, they will be coupled
+meaning they receive the point at the same time.
+
+The internal class MetaArgTracker provides the functionality to manage this coupling
+behaviour. The examples below provide an example of expected behaviour.
+"""
+
+
 def add_elements(element, index, current_elements):
     current_elements[index] = element
 

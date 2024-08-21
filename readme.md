@@ -73,7 +73,7 @@ Configurable instruments are those who need to be set up before a measure is tak
 are the devices that provide "points" for configuration to the SER. In our
 Summary's example case the function generator and translation unit are the configurable 
 instruments. The other kind of instruments are those which are observable. These instruments
-are those who store that take the measurements once all of the configurable instruments
+are those who store that take the measurements once all the configurable instruments
 are observed. In our example case the lock-in amplifier would be the observable
 instrument.
 
@@ -92,13 +92,72 @@ the [test file for the arg tracker](tests/generator_test.py)
 
 ### View Controller
 
+Each component has an independent UI that is tasked with display its configuration parameters
+to the user and allowing to change them as necessary. These UIs are developed in the
+QT framework. In general, it's recommended that it's a groupbox that includes the name of
+the device as the title, and it be created with the QT designer application. For
+ease of use, we utilize the helper functions provided by lantz that allow automatic connection
+between its feats and QT widgets and loading up a .ui file as a widget in the Frontend 
+lantz class.
+
+TODO: INSERT IMAGES HERE
+
 ## API Documentation
 
-### 
+### Launch Functions
+
+    get_main_widget(configurable_components: Collection[src.SER.interfaces.component.ComponentInitialization], observable_components: Collection[src.SER.interfaces.component.ComponentInitialization], run_data_ui: Collection[src.SER.interfaces.user_interface.ProcessDataUI], final_data_ui: Collection[src.SER.interfaces.user_interface.FinalDataUI], coupling_ui_options: dict[str, typing.Any] = {}, conf_folder='.', out_folder='.', locale='en') -> PyQt5.QtWidgets.QWidget
+        This function creates a widget that contains the SER. The widget loads the configuration ui provided by the
+        components and can be interacted by the user.
+
+        :param configurable_components: List of ComponentInitialization that include ConfigurableInstrument
+        :param observable_components: List of ComponentInitialization that include ObservableInstrument
+        :param run_data_ui: List of ProcessDataUI that reads the data and displays it as the experiment is running
+        :param final_data_ui: List of FinalDataUI that reads the data and displays it after the experiment is finished
+        :param coupling_ui_options: Dictionary with data to initialize the gui that changes the coupling. It should contain
+        'enabled' bool, 'x' int, 'y' int, indicating if it needs to be enabled and the coordinated respectively.
+        :param conf_folder: Direction to a folder where to open the save dialog for configuration files by default
+        :param out_folder: Direction to a folder where to open the save dialog for output files by default
+        :param locale: Value indicating what language to display the interface. 'en' for english and 'es' for spanish
+        :return: A QWidget that can be embedded in your QT application.
+
+    launch_app(app: PyQt5.QtWidgets.QApplication, configurable_components: Collection[src.SER.interfaces.component.ComponentInitialization], observable_components: Collection[src.SER.interfaces.component.ComponentInitialization], run_data_ui: Collection[src.SER.interfaces.user_interface.ProcessDataUI], final_data_ui: Collection[src.SER.interfaces.user_interface.FinalDataUI], coupling_ui_options: dict[str, typing.Any] = {}, conf_folder='.', out_folder='.', locale='en')
+        This function uses the widget created by get_main_widget(...) to create the main QT application.
+
+        :param app: QApplication object in which to run the app. It's necessary to provide as components cannot be
+        created without a running QApplication in the background.
+        :param configurable_components: List of ComponentInitialization that include ConfigurableInstrument
+        :param observable_components: List of ComponentInitialization that include ObservableInstrument
+        :param run_data_ui: List of ProcessDataUI that reads the data and displays it as the experiment is running
+        :param final_data_ui: List of FinalDataUI that reads the data and displays it after the experiment is finished
+        :param coupling_ui_options: Dictionary with data to initialize the gui that changes the coupling. It should contain
+        'enabled' bool, 'x' int, 'y' int, indicating if it needs to be enabled and the coordinated respectively.
+        :param conf_folder: Direction to a folder where to open the save dialog for configuration files by default
+        :param out_folder: Direction to a folder where to open the save dialog for output files by default
+        :param locale: Value indicating what language to display the interface. 'en' for english and 'es' for spanish
+        :return: None. This will return when the user closes the app.
 
 ### Developing Components
 
-To primary tool necessary for using 
+The components that the launch function requires are to be provided by the user.
+The component is created by inheriting either ObservableInstrument and ConfigurableInstrument
+and inheriting ConfigurationUI and wrapping them in a Component and ComponentInitialization.
+
+    class ComponentInitialization:
+        name: str  # The name of the component, used to distinguish the different components for the data
+    
+        def __init__(self, component: Component, coupling: int, x: int, y: int, name: str = None):
+            """
+            This class provides a wrapper for the component, allowing it to have identifiable information distinct
+            from the other components. This information is provided as parameters for this constructor.
+    
+            :param component: The component to be wrapped.
+            :param coupling: The coupling of the component. See tests/generator_test.py for a detailed explanation.
+            :param x: The x coordinate for the configuration ui to be displayed in the configuration screen grid.
+            :param y: The y coordinate for the configuration ui to be displayed in the configuration screen grid.
+            :param name: The unique name for the component. If multiple devices with the same name are provided an exception
+            will be raised.
+            """
 
 ![Component Structure](/Documentation/UML%20Trabajo%20Profesional.png)
 

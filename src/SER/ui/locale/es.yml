@@ -1,3 +1,6 @@
+# Genérico
+SER: "Corredor de Experimentos Científicos"
+
 progress_label: "{}/{}\t Tiempo Transcurrido: {}\t Tiempo Restante: {}"
 start_experiment: "Comenzar Experimento"
 running: "Ejecutando"
