@@ -20,3 +20,7 @@ stop: "STOP"
 
 # Data
 data: "Data"
+save_as_csv: "Save as .csv"
+save_as_mat: "Save as .mat"
+save_as_md: "Save as .md"
+save_as_html: "Save as .html"

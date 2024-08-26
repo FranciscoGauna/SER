@@ -18,6 +18,14 @@ for the user.
 Example use case: coordinating a translation stage containing a sample, 
 a probing laser heating the material and a lock-in amplifier to measure the laser distortion.
 
+Example Screenshots of the demo application:
+
+![Configuration Screen](/Documentation/App%20Conf%20Screenshot.png)
+
+![Run Screen](/Documentation/App%20Progress%20Screenshot.png)
+
+![Data Screen](/Documentation/App%20Data%20Screenshot.png)
+
 ## Dependencies
 
 A pip requirements file is provided, with a `frozenreqs.txt` file specifying the
@@ -90,6 +98,18 @@ value, the resulting configurations will look like this:
 (1mm, 10Hz) -> (1mm, 100Hz) -> (2mm, 10Hz) -> (2mm, 100Hz). For more examples, see 
 the [test file for the arg tracker](tests/generator_test.py)
 
+#### Sequence and Runs
+
+When the user is configuring the experiment, they may chain multiple different runs
+in a sequence. Each run has its own configuration data. The scheduled runs can be
+seen in a list at the bottom of the application. The User can also save them to disk
+through a series of controls under "Load Configuration". During execution, at the 
+beginning of each run SER loads the configuration into the components.
+
+#### Data Format
+
+
+
 ### View Controller
 
 Each component has an independent UI that is tasked with display its configuration parameters
@@ -100,7 +120,9 @@ ease of use, we utilize the helper functions provided by lantz that allow automa
 between its feats and QT widgets and loading up a .ui file as a widget in the Frontend 
 lantz class.
 
-TODO: INSERT IMAGES HERE
+Example of the application with:
+
+![Configuration Screen](/Documentation/App%20Conf%20Screenshot.png)
 
 ## API Documentation
 
@@ -139,7 +161,11 @@ TODO: INSERT IMAGES HERE
 
 ### Developing Components
 
-The components that the launch function requires are to be provided by the user.
+The components that the launch function requires are to be provided by the user, 
+which most follow the following structure.
+
+![Component Structure](/Documentation/UML%20Trabajo%20Profesional.png)
+
 The component is created by inheriting either ObservableInstrument and ConfigurableInstrument
 and inheriting ConfigurationUI and wrapping them in a Component and ComponentInitialization.
 
@@ -147,7 +173,6 @@ and inheriting ConfigurationUI and wrapping them in a Component and ComponentIni
         name: str  # The name of the component, used to distinguish the different components for the data
     
         def __init__(self, component: Component, coupling: int, x: int, y: int, name: str = None):
-            """
             This class provides a wrapper for the component, allowing it to have identifiable information distinct
             from the other components. This information is provided as parameters for this constructor.
     
@@ -157,14 +182,145 @@ and inheriting ConfigurationUI and wrapping them in a Component and ComponentIni
             :param y: The y coordinate for the configuration ui to be displayed in the configuration screen grid.
             :param name: The unique name for the component. If multiple devices with the same name are provided an exception
             will be raised.
-            """
-
-![Component Structure](/Documentation/UML%20Trabajo%20Profesional.png)
 
 #### Instrument
 
+    class Instrument(Backend):
+        Class handling one or multiple devices, their configuration between runs and providing the variable documentation
+        and points over which the device will iterate over the course of the experiment
+
+        Note that the Backend class has an initialize method that gets executed each time a run is started
+        if you need to update a parameter between runs, you can overload it and utilize it
+
+        def get_config(self) -> Dict:
+            This is used to save the configration parameters for each run. The values are saved on a json format when
+            serialized in a file format. As such, return only objects that can be saved in that format.
+    
+            :return: a dictionary of configuration parameters and their values.
+    
+        def set_config(self, config: Dict) -> None:
+            This is used to restore the configration parameters for each run. The values are saved on a json format when
+            serialized in a file format. As such, return only objects that can be saved in that format.
+            
+        def variable_documentation(self) -> Dict[str, str]:
+            This method should return a string containing the documentation for each kind of variable, including
+            what it represents, what is the range of value and what is the unit.
+    
+            :return: a dictionary of variable names and their documentation.
+    
+        def stop(self) -> None:
+            This method gets called if the experiment stopped prematurely by the user. If that's the case, do any
+            procedures necessary to stop the instrument
+    
+    
+    class ObservableInstrument(Instrument):
+    
+        def observe(self) -> Dict[str, Any]:
+            This method gets called on each iteration points of the experiment.
+    
+            :return: a dictionary of observable parameters and their values.
+    
+    
+    class ConfigurableInstrument(Instrument):
+        coupling: int # Stores the coupling level. 
+    
+        def set_config(self, config: Dict):
+            This is used to restore the configration parameters for each run. The values are saved on a json format when
+            serialized in a file format. As such, return only objects that can be saved in that format. The super
+            call for this function includes coupling, so it should be called on reimplementation.
+    
+        def get_config(self) -> Dict:
+            This is used to save the configration parameters for each run. The values are saved on a json format when
+            serialized in a file format. As such, return only objects that can be saved in that format. The super
+            call for this function includes coupling, so it should be called on reimplementation.
+    
+            :return: a dictionary of configuration parameters and their values.
+    
+        def configure(self, *args) -> Dict[str, Any]:
+            This method gets called on each iteration points of the experiment. It receives an unrolled tuple,
+            so you can replace *args with your arguments.
+            
+            :return: a dictionary of relevant parameters and their values.
+    
+        def get_points(self) -> Generator[Tuple, None, None]:
+            The function get_points is tasked with providing the points a component will use during its execution.
+            The way it does this is through python Generators, as the task reads the task point by point. You can also
+            provide other iterators that support next(_) and StopIteration.
+    
+            If 2 components are coupled AKA they both move simultaneously, they need to yield the same amount of points.
+            Not respecting this is undefined behaviour
+            :return: Generator with the amount of desired points
+    
+        def point_amount(self) -> int:
+            :return: the amount of points this instrument generates with the Generator from get_points
+
 #### Configuration UI
+
+    class ConfigurationUI(Frontend):
+        """This class represents a Configuration User Interface. It's used before the start of the experiment, and it's
+        used to set up the instrument before execution and provide the points during which the experiment is executed."""
+    
+        # This is a recommendation, you can rename the instrument to something else
+        instrument: Instrument
+    
+        # path to the ui file you want to load. The format is either a string or a tuple with the folders of the path
+        # ex: "ui/example.ui" or ("ui", "example.ui")
+        gui: Union[str, tuple] 
 
 #### ProcessDataUI
 
+    class ProcessDataUI(Frontend):
+        This class represents the User Interface that displays the data from experiment during its execution.
+        It gets updated at the end of each iteration with the method add_data.
+    
+        # These are used by the gui to load its position
+        x: int
+        y: int
+    
+        def __init__(self, x, y, parent=None, backend=None):
+            :param x: The x coordinate for the process ui to be displayed in the progress screen grid.
+            :param y: The y coordinate for the process ui to be displayed in the progress screen grid.
+            :param parent: Sent to the Frontend Construct. See Lantz for more information.
+            :param backend: Sent to the Frontend Construct. See Lantz for more information.
+
+        def initialize(self):
+            This method gets run by the ui manager (SER/ui/process_ui_manager.py) each time a new run is started.
+            Use it to reset the status of the ui to an empty one without data.
+    
+        def add_data(self, data: List[Dict[str, Dict[str, Any]]]):
+            This method gets run periodically by the ui manager. The data is in the following format.
+            [
+                {"component 1 name": {var1 : value1, var2 : value2, ...}, ...},  # This corresponds to one iteration
+                {"component 1 name": {var1 : value3, var2 : value4, ...}, ...},  # of the instrument configuration cycle
+            ]
+    
+            Component data for configuration devices is added only if that device was configured during this iteration.
+            Due to this is it strongly recommended to store the previous value if it's needed for display calculations.
+            The variables and values depend on what is given by the observe and configure methods in the components
+            provided.
+
 #### FinalDataUI
+
+    class FinalDataUI(Frontend):
+        This class represents the User Interface that displays the data from experiment, once it has concluded.
+        It displays only the data from the last run in the sequence.
+    
+        # These are used by the gui to load its position
+        x: int
+        y: int
+    
+        def __init__(self, x, y, parent=None, backend=None):
+            :param x: The x coordinate for the process ui to be displayed in the data screen grid.
+            :param y: The y coordinate for the process ui to be displayed in the data screen grid.
+            :param parent: Sent to the Frontend Construct. See Lantz for more information.
+            :param backend: Sent to the Frontend Construct. See Lantz for more information.
+    
+        def set_data(self, data: List[Dict[str, Dict[str, Any]]]):
+            This method gets run once at the end by the ui manager. The data is in the following format.
+            [
+                {"component 1 name": {var1 : value1, var2 : value2, ...}, ...},  # This corresponds to one iteration
+                {"component 1 name": {var1 : value3, var2 : value4, ...}, ...},  # of the instrument configuration cycle
+            ]
+    
+            The variables and values depend on what is given by the observe and configure methods in the components
+            provided.

@@ -6,6 +6,13 @@ from lantz.qt import Backend
 
 
 class Instrument(Backend):
+    """
+    Class handling one or multiple devices, their configuration between runs and providing the variable documentation
+    and points over which the device will iterate over the course of the experiment
+
+    Note that the Backend class has an initialize method that gets executed each time a run is started
+        if you need to update a parameter between runs, you can overload it and utilize it
+    """
 
     def __init__(self, **instruments_and_backends):
         super().__init__(**instruments_and_backends)
