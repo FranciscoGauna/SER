@@ -17,66 +17,32 @@
    <string>VirtualPlatina</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QLabel" name="x_amount_label">
+   <item row="0" column="2">
+    <widget class="QLabel" name="final_label">
      <property name="text">
-      <string>X Amount</string>
+      <string>Final Position</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="amount_label">
+     <property name="text">
+      <string>Amount</string>
      </property>
     </widget>
    </item>
    <item row="0" column="1">
-    <widget class="QLabel" name="x_init_label">
+    <widget class="QLabel" name="init_label">
      <property name="text">
-      <string>X Initial Position</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
-    <widget class="QLabel" name="x_final_label">
-     <property name="text">
-      <string>X Final Position</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QSpinBox" name="x_amount_spinbox">
-     <property name="minimum">
-      <number>2</number>
-     </property>
-     <property name="maximum">
-      <number>10000</number>
+      <string>Initial Position</string>
      </property>
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QDoubleSpinBox" name="x_init_spinbox"/>
+    <widget class="QDoubleSpinBox" name="init_spinbox"/>
    </item>
-   <item row="1" column="2">
-    <widget class="QDoubleSpinBox" name="x_final_spinbox"/>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="y_amount_label">
-     <property name="text">
-      <string>Y Amount</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QLabel" name="y_init_label">
-     <property name="text">
-      <string>Y Initial Position</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="QLabel" name="y_final_label">
-     <property name="text">
-      <string>Y Final Position</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QSpinBox" name="y_amount_spinbox">
+   <item row="1" column="0">
+    <widget class="QSpinBox" name="amount_spinbox">
      <property name="minimum">
       <number>2</number>
      </property>
@@ -85,11 +51,8 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="1">
-    <widget class="QDoubleSpinBox" name="y_init_spinbox"/>
-   </item>
-   <item row="3" column="2">
-    <widget class="QDoubleSpinBox" name="y_final_spinbox"/>
+   <item row="1" column="2">
+    <widget class="QDoubleSpinBox" name="final_spinbox"/>
    </item>
   </layout>
  </widget>

@@ -7,6 +7,8 @@ save_configuration: "Save Configuration"
 add_run_configuration: "Add Run Configuration"
 load_run: "Load Run Configuration"
 save_run: "Save Run Configuration"
+load_sequence: "Load Sequence"
+save_sequence: "Save Sequence"
 start_experiment: "Start Experiment"
 configuration: "Configuration"
 
