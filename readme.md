@@ -106,9 +106,17 @@ seen in a list at the bottom of the application. The User can also save them to 
 through a series of controls under "Load Configuration". During execution, at the 
 beginning of each run SER loads the configuration into the components.
 
-#### Data Format
+#### Logging
 
+Logging is handled through the Lantz library logging core. As such it is recommended
+developers read its documentation for handling.
 
+#### Profiling
+
+If you are having issues with performance and need to run a profiler
+of your module in execution, the module can run in profiling mode by setting to
+true the environment variable `ENABLE_PROFILING`. This will create a profile
+file for each execution
 
 ### View Controller
 

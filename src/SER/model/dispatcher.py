@@ -10,7 +10,6 @@ counter = 0
 
 
 def execute_fun(task: tuple[callable, tuple]):
-    # TODO: documentar esta linea
     if environ.get("ENABLE_PROFILING"):
         global counter
         filename = f"profiling/dispatcher_{counter}.profile"
@@ -34,7 +33,6 @@ class Dispatcher(LogMixin):
         self.tasks.append((fun, args))
 
     def execute(self) -> Collection[Tuple[str, Dict[str, Any]]]:
-        # TODO: Check if the threads crashed, we need to stop if that happens
         with ThreadPoolExecutor() as executor:
             futures = [executor.submit(execute_fun, task) for task in self.tasks]
         self.tasks.clear()
