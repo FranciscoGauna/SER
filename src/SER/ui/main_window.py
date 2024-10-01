@@ -1,7 +1,6 @@
-import json
 from os import path
 from threading import Thread, Lock
-from traceback import format_exception_only
+from traceback import format_exception, format_exception_only
 from typing import Collection, Any
 from logging import getLogger as get_logger
 
@@ -146,6 +145,11 @@ class MainWidget(QWidget, LogMixin):
         self.data_save_csv_button.pressed.connect(self.export_to_csv)
         for ui in self.final_data_ui:
             self.data_layout.addWidget(ui, ui.y, ui.x)
+            try:
+                ui.set_data(self.sequencer.data.to_internal_repr())
+            except Exception as e:
+                ui.log_critical("".join(format_exception(e)))
+
 
         # Text
         self.data_box.setTitle(localizator.get("data"))
@@ -192,6 +196,7 @@ class MainWidget(QWidget, LogMixin):
             error_box = QMessageBox()
             error_box.setText(f"There was an exception during the execution of the program:\n"
                               f"{''.join(format_exception_only(self.error))}")
+            self.log_critical("".join(format_exception(self.error)))
             error_box.exec()
 
     # Export Data

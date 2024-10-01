@@ -10,12 +10,12 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.colors import Colormap
 from PyQt5.QtGui import QColor
 
-from src.SER.interfaces.user_interface import ProcessDataUI
+from src.SER.interfaces.user_interface import ProcessDataUI, FinalDataUI
 
 matplotlib.use('Qt5Agg')
 
 
-class TwoDMapper(ProcessDataUI):
+class TwoDMapper(ProcessDataUI, FinalDataUI):
     data: List[tuple[Any, Any, float]]
 
     def __init__(self, x_variable: tuple[str, str, str], y_variable: tuple[str, str, str],
@@ -66,6 +66,11 @@ class TwoDMapper(ProcessDataUI):
             parsed_matrix.append(list(v.values()))
         self.canvas.update_with_data(parsed_matrix)
 
+    def set_data(self, data: List[Dict[str, Dict[str, Any]]]):
+        self.initialize()
+        self.add_data(data)
+
+
 
 class PlotCanvas(FigureCanvasQTAgg):
 
@@ -79,6 +84,8 @@ class PlotCanvas(FigureCanvasQTAgg):
 
     def color(self, data: Iterable[float | None]):
         res = []
+        if len(list(data)) == 0:
+            res.append((0, 0, 0, 1))
         for datum in data:
             if datum is None:
                 res.append((0, 0, 0, 1))

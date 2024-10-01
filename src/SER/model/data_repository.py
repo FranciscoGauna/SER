@@ -30,6 +30,29 @@ class DataRepository(LogMixin):
     def get_datum_index(self, index):
         return self.data[index]
 
+    def to_internal_repr(self) -> List[Dict[str, Dict[str, Any]]]:
+        header: set[Tuple[str, str]] = set()
+        for item in self.data:
+            for k, v in item.items():
+                for sub_k in v:
+                    header.add((k, sub_k))
+
+        vals = []
+        for line in self.data:
+            line_val = {}
+            for k, v in header:
+                if k not in line_val:
+                    line_val[k] = {}
+
+                if k in line and v in line[k]:
+                    line_val[k][v] = line[k][v]
+                elif len(vals) > 0 and k in vals[-1] and v in vals[-1][k]:
+                    line_val[k][v] = vals[-1][k][v]
+                else:
+                    line_val[k][v] = float("NaN")
+            vals.append(line_val)
+        return vals
+
     def to_dataframe(self) -> pd.DataFrame:
         header: set[Tuple[str, str]] = set()
         for item in self.data:

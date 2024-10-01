@@ -1,5 +1,6 @@
 import json
 from threading import Lock
+from traceback import format_exception
 from typing import Collection
 from logging import getLogger as get_logger
 
@@ -99,7 +100,10 @@ class ProcessUIManager(QObject, LogMixin):
         # Now that we have thread safe data, we update the process_ui which the data since the last iteration
         self.progress_tracker.advance(len(delta_list))
         for process_ui in self.process_uis:
-            process_ui.add_data(delta_list)
+            try:
+                process_ui.add_data(delta_list)
+            except Exception as e:
+                process_ui.log_critical("".join(format_exception(e)))
 
         if self.running:
             QTimer().singleShot(REFRESH_TIME, self.screen_tick)
