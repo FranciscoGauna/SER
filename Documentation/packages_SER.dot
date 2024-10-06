@@ -1,0 +1,53 @@
+digraph "packages_SER" {
+rankdir=BT
+charset="utf-8"
+"SER" [color="black", label=<SER>, shape="box", style="solid"];
+"SER.interfaces" [color="black", label=<SER.interfaces>, shape="box", style="solid"];
+"SER.interfaces.component" [color="black", label=<SER.interfaces.component>, shape="box", style="solid"];
+"SER.interfaces.instrument" [color="black", label=<SER.interfaces.instrument>, shape="box", style="solid"];
+"SER.interfaces.user_interface" [color="black", label=<SER.interfaces.user_interface>, shape="box", style="solid"];
+"SER.log" [color="black", label=<SER.log>, shape="box", style="solid"];
+"SER.main" [color="black", label=<SER.main>, shape="box", style="solid"];
+"SER.model" [color="black", label=<SER.model>, shape="box", style="solid"];
+"SER.model.data_repository" [color="black", label=<SER.model.data_repository>, shape="box", style="solid"];
+"SER.model.dispatcher" [color="black", label=<SER.model.dispatcher>, shape="box", style="solid"];
+"SER.model.documentation" [color="black", label=<SER.model.documentation>, shape="box", style="solid"];
+"SER.model.gen" [color="black", label=<SER.model.gen>, shape="box", style="solid"];
+"SER.model.runner" [color="black", label=<SER.model.runner>, shape="box", style="solid"];
+"SER.model.sequencer" [color="black", label=<SER.model.sequencer>, shape="box", style="solid"];
+"SER.ui" [color="black", label=<SER.ui>, shape="box", style="solid"];
+"SER.ui.color_list" [color="black", label=<SER.ui.color_list>, shape="box", style="solid"];
+"SER.ui.components_dialog" [color="black", label=<SER.ui.components_dialog>, shape="box", style="solid"];
+"SER.ui.coupling_ui" [color="black", label=<SER.ui.coupling_ui>, shape="box", style="solid"];
+"SER.ui.data_table" [color="black", label=<SER.ui.data_table>, shape="box", style="solid"];
+"SER.ui.localization" [color="black", label=<SER.ui.localization>, shape="box", style="solid"];
+"SER.ui.main_window" [color="black", label=<SER.ui.main_window>, shape="box", style="solid"];
+"SER.ui.process_ui_manager" [color="black", label=<SER.ui.process_ui_manager>, shape="box", style="solid"];
+"SER.ui.progress_tracker" [color="black", label=<SER.ui.progress_tracker>, shape="box", style="solid"];
+"SER.utils" [color="black", label=<SER.utils>, shape="box", style="solid"];
+"SER.utils.verify" [color="black", label=<SER.utils.verify>, shape="box", style="solid"];
+"SER" -> "SER.main" [arrowhead="open", arrowtail="none"];
+"SER.interfaces" -> "SER.interfaces.component" [arrowhead="open", arrowtail="none"];
+"SER.interfaces" -> "SER.interfaces.instrument" [arrowhead="open", arrowtail="none"];
+"SER.interfaces" -> "SER.interfaces.user_interface" [arrowhead="open", arrowtail="none"];
+"SER.main" -> "SER.interfaces" [arrowhead="open", arrowtail="none"];
+"SER.main" -> "SER.log" [arrowhead="open", arrowtail="none"];
+"SER.main" -> "SER.model" [arrowhead="open", arrowtail="none"];
+"SER.main" -> "SER.ui" [arrowhead="open", arrowtail="none"];
+"SER.model" -> "SER.model.sequencer" [arrowhead="open", arrowtail="none"];
+"SER.model.runner" -> "SER.model.data_repository" [arrowhead="open", arrowtail="none"];
+"SER.model.runner" -> "SER.model.dispatcher" [arrowhead="open", arrowtail="none"];
+"SER.model.runner" -> "SER.model.gen" [arrowhead="open", arrowtail="none"];
+"SER.model.sequencer" -> "SER.model.data_repository" [arrowhead="open", arrowtail="none"];
+"SER.model.sequencer" -> "SER.model.runner" [arrowhead="open", arrowtail="none"];
+"SER.ui" -> "SER.ui.main_window" [arrowhead="open", arrowtail="none"];
+"SER.ui" -> "SER.ui.localization" [arrowhead="open", arrowtail="none"];
+"SER.ui.components_dialog" -> "SER.ui.process_ui_manager" [arrowhead="open", arrowtail="none"];
+"SER.ui.main_window" -> "SER.ui.components_dialog" [arrowhead="open", arrowtail="none"];
+"SER.ui.main_window" -> "SER.ui.coupling_ui" [arrowhead="open", arrowtail="none"];
+"SER.ui.main_window" -> "SER.ui.data_table" [arrowhead="open", arrowtail="none"];
+"SER.ui.main_window" -> "SER.ui.process_ui_manager" [arrowhead="open", arrowtail="none"];
+"SER.ui.main_window" -> "SER.ui.progress_tracker" [arrowhead="open", arrowtail="none"];
+"SER.ui.process_ui_manager" -> "SER.ui.color_list" [arrowhead="open", arrowtail="none"];
+"SER.ui.process_ui_manager" -> "SER.ui.progress_tracker" [arrowhead="open", arrowtail="none"];
+}

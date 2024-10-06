@@ -1,0 +1,37 @@
+digraph "SER.interfaces.instrument.Instrument" {
+rankdir=BT
+charset="utf-8"
+"PySignal.ClassSignal" [color="black", fontcolor="black", label=<{PySignal.ClassSignal|<br ALIGN="LEFT"/>|}>, shape="record", style="solid"];
+"SER.interfaces.instrument.Instrument" [color="black", fontcolor="black", label=<{SER.interfaces.instrument.Instrument|logger : NoneType, RootLogger<br ALIGN="LEFT"/>logger_name : str<br ALIGN="LEFT"/>|<I>get_config</I>(): Dict<br ALIGN="LEFT"/><I>set_config</I>(config: Dict): None<br ALIGN="LEFT"/>stop(): None<br ALIGN="LEFT"/><I>variable_documentation</I>(): Dict[str, str]<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"lantz.core.driver.Base" [color="black", fontcolor="black", label=<{lantz.core.driver.Base|actions<br ALIGN="LEFT"/>dictfeats<br ALIGN="LEFT"/>feats<br ALIGN="LEFT"/>logger_name : NoneType<br ALIGN="LEFT"/>name<br ALIGN="LEFT"/>|}>, shape="record", style="solid"];
+"lantz.core.driver.MyDict" [color="black", fontcolor="black", label=<{lantz.core.driver.MyDict|<br ALIGN="LEFT"/>|}>, shape="record", style="solid"];
+"lantz.core.helpers.NamedObject" [color="black", fontcolor="black", label=<{lantz.core.helpers.NamedObject|name<br ALIGN="LEFT"/>|}>, shape="record", style="solid"];
+"lantz.qt.app.Backend" [color="black", fontcolor="black", label=<{lantz.qt.app.Backend|backends : NoneType<br ALIGN="LEFT"/>flocks : NoneType<br ALIGN="LEFT"/>instruments : NoneType<br ALIGN="LEFT"/>logger_name : str<br ALIGN="LEFT"/>|finalize()<br ALIGN="LEFT"/>initialize(register_finalizer)<br ALIGN="LEFT"/>invoke(func)<br ALIGN="LEFT"/>moveToThread(thread)<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"lantz.qt.app.HidingLock" [color="black", fontcolor="black", label=<{lantz.qt.app.HidingLock|lock : _RLock<br ALIGN="LEFT"/>|}>, shape="record", style="solid"];
+"lantz.qt.app.ThreadLogMixin" [color="black", fontcolor="black", label=<{lantz.qt.app.ThreadLogMixin|<br ALIGN="LEFT"/>|log_current_thread(msg)<br ALIGN="LEFT"/>moveToThread(thread)<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"lantz.qt.utils.qt.superQ.SuperQClass" [color="black", fontcolor="black", label=<{lantz.qt.utils.qt.SuperQClass|<br ALIGN="LEFT"/>|}>, shape="record", style="solid"];
+"pimpmyclass.mixins.AsyncMixin" [color="black", fontcolor="black", label=<{pimpmyclass.mixins.AsyncMixin|async_executor<br ALIGN="LEFT"/>async_pending<br ALIGN="LEFT"/>|attach_async(func)<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"pimpmyclass.mixins.BaseLogMixin" [color="black", fontcolor="black", label=<{pimpmyclass.mixins.BaseLogMixin|<br ALIGN="LEFT"/>|<I>log</I>(level, msg)<br ALIGN="LEFT"/>log_critical(msg)<br ALIGN="LEFT"/>log_debug(msg)<br ALIGN="LEFT"/>log_error(msg)<br ALIGN="LEFT"/>log_info(msg)<br ALIGN="LEFT"/>log_warning(msg)<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"pimpmyclass.mixins.CacheMixin" [color="black", fontcolor="black", label=<{pimpmyclass.mixins.CacheMixin|<br ALIGN="LEFT"/>|recall(keys)<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"pimpmyclass.mixins.LockMixin" [color="black", fontcolor="black", label=<{pimpmyclass.mixins.LockMixin|lock<br ALIGN="LEFT"/>|}>, shape="record", style="solid"];
+"pimpmyclass.mixins.LogMixin" [color="black", fontcolor="black", label=<{pimpmyclass.mixins.LogMixin|logger<br ALIGN="LEFT"/>logger_extra<br ALIGN="LEFT"/>logger_name : NoneType<br ALIGN="LEFT"/>|log(level, msg)<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"pimpmyclass.mixins.ObservableMixin" [color="black", fontcolor="black", label=<{pimpmyclass.mixins.ObservableMixin|<br ALIGN="LEFT"/>|}>, shape="record", style="solid"];
+"pimpmyclass.mixins.StorageMixin" [color="black", fontcolor="black", label=<{pimpmyclass.mixins.StorageMixin|storage<br ALIGN="LEFT"/>|}>, shape="record", style="solid"];
+"SER.interfaces.instrument.Instrument" -> "lantz.qt.app.Backend" [arrowhead="empty", arrowtail="none"];
+"lantz.core.driver.Base" -> "pimpmyclass.mixins.AsyncMixin" [arrowhead="empty", arrowtail="none"];
+"lantz.core.driver.Base" -> "pimpmyclass.mixins.CacheMixin" [arrowhead="empty", arrowtail="none"];
+"lantz.core.driver.Base" -> "pimpmyclass.mixins.LogMixin" [arrowhead="empty", arrowtail="none"];
+"lantz.core.driver.Base" -> "pimpmyclass.mixins.ObservableMixin" [arrowhead="empty", arrowtail="none"];
+"lantz.core.driver.Base" -> "pimpmyclass.mixins.StorageMixin" [arrowhead="empty", arrowtail="none"];
+"lantz.qt.app.Backend" -> "lantz.core.driver.Base" [arrowhead="empty", arrowtail="none"];
+"lantz.qt.app.Backend" -> "lantz.qt.app.ThreadLogMixin" [arrowhead="empty", arrowtail="none"];
+"lantz.qt.app.Backend" -> "lantz.qt.utils.qt.superQ.SuperQClass" [arrowhead="empty", arrowtail="none"];
+"pimpmyclass.mixins.AsyncMixin" -> "pimpmyclass.mixins.LockMixin" [arrowhead="empty", arrowtail="none"];
+"pimpmyclass.mixins.LogMixin" -> "pimpmyclass.mixins.BaseLogMixin" [arrowhead="empty", arrowtail="none"];
+"PySignal.ClassSignal" -> "lantz.core.driver.Base" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="_observer_signal_init", style="solid"];
+"lantz.core.driver.MyDict" -> "lantz.core.driver.Base" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="_lantz_feats", style="solid"];
+"lantz.core.driver.MyDict" -> "lantz.core.driver.Base" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="_lantz_dictfeats", style="solid"];
+"lantz.core.driver.MyDict" -> "lantz.core.driver.Base" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="_lantz_actions", style="solid"];
+"lantz.core.helpers.NamedObject" -> "lantz.core.driver.Base" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="_cache_unset_value", style="solid"];
+"lantz.qt.app.HidingLock" -> "lantz.qt.app.ThreadLogMixin" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="_PP_THREADS", style="solid"];
+}

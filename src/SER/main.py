@@ -3,11 +3,10 @@ from typing import Collection, Any
 
 from PyQt5.QtWidgets import QApplication, QWidget
 
-from .model.sequencer import ExperimentSequencer
-from .ui.main_window import MainWidget
+from .model import ExperimentSequencer
+from .ui import MainWidget, localizator
 from .interfaces import ComponentInitialization, ProcessDataUI, FinalDataUI
 from .log import log_to_socket, LOGGER, log_to_screen
-from .ui.localization import localizator
 
 
 # Note we only read the coupling_ui_options, so it doesn't matter if it's mutable.
