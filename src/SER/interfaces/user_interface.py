@@ -28,9 +28,6 @@ class ProcessDataUI(Frontend):
     """This class represents the User Interface that displays the data from experiment during its execution.
     It gets updated at the end of each iteration with the method add_data."""
 
-    # This is a recommendation, you can rename the instrument to something else
-    instrument: Instrument
-
     # These are used by the gui to load its position
     x: int
     y: int
@@ -76,9 +73,6 @@ class ProcessDataUI(Frontend):
 class FinalDataUI(Frontend):
     """This class represents the User Interface that displays the data from experiment, once it has concluded.
     It displays only the data from the last run in the sequence."""
-
-    # This is a recommendation, you can rename the instrument to something else
-    instrument: Instrument
 
     # These are used by the gui to load its position
     x: int

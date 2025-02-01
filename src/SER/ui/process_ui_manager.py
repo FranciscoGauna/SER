@@ -1,5 +1,6 @@
 import json
 from threading import Lock
+from os import environ
 from traceback import format_exception
 from typing import Collection
 from logging import getLogger as get_logger
@@ -17,7 +18,7 @@ from ..model.sequencer import ExperimentSequencer
 
 # Time between update ticks
 # TODO: Think about changing this to a parameter or an environment variable
-REFRESH_TIME = 50  # ms
+REFRESH_TIME = int(environ.get("REFRESH_TIME", 50))  # ms
 COLOR_RUN_END = "green"
 COLOR_RUN_IN_PROGRESS = "yellow"
 COLOR_RUN_STOPPED = "red"
